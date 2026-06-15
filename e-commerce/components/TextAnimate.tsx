@@ -27,7 +27,7 @@ export default function TextAnimate() {
   const hasGreenWord = displayText.includes(greenWord);
 
   return (
-    <h1 className="text-2xl text-center lg:text-5xl lg:text-start font-bold 2xl:mt-36 xs:text-3xl">
+    <h1 className="text-2xl text-center lg:text-5xl lg:text-start font-bold 2xl:mt-25 xs:text-3xl">
       {!hasGreenWord ? (
         displayText
       ) : (

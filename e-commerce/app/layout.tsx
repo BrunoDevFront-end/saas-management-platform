@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Syne, Syne_Mono } from "next/font/google";
+import { Toaster } from "sonner";
 
 const syne = Syne({
   subsets: ["latin"],
@@ -42,6 +43,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col justify-center items-center font-syne ">
         {children}
+        <Toaster richColors position="top-right" />
       </body>
     </html>
   );

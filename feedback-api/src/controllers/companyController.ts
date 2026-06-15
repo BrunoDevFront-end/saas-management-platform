@@ -20,6 +20,8 @@ export const companyController = {
     try {
       const { name, email, password, segment } = req.body;
 
+      const normalizedEmail = email.trim().toLowerCase();
+
       // 1. Valida se todos os campos foram enviados
       if (!name || !email || !password) {
         return res
@@ -29,7 +31,7 @@ export const companyController = {
 
       // 2. Verifica se o email já está cadastrado
       const emailExists = await prisma.company.findUnique({
-        where: { email },
+        where: { email: normalizedEmail },
       });
 
       if (emailExists) {
@@ -56,7 +58,7 @@ export const companyController = {
       const company = await prisma.company.create({
         data: {
           name,
-          email,
+          email: normalizedEmail,
           passwordHash,
           segment,
           slug,
@@ -80,6 +82,7 @@ export const companyController = {
   async login(req: Request, res: Response) {
     try {
       const { email, password } = req.body;
+      const normalizedEmail = email.trim().toLowerCase();
 
       // 1. Valida se os campos foram enviados
       if (!email || !password) {
@@ -90,7 +93,7 @@ export const companyController = {
 
       // 2. Busca a empresa no banco pelo email
       const company = await prisma.company.findUnique({
-        where: { email },
+        where: { email: normalizedEmail },
       });
 
       // 3. Se não encontrar, retorna erro genérico
