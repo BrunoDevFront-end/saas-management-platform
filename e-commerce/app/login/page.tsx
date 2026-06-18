@@ -5,48 +5,112 @@ import { useState } from "react";
 import TextAnimate from "@/components/TextAnimate";
 import { House } from "lucide-react";
 import Link from "next/link";
+import { LoginCompany } from "@/components/request";
+import { useRouter } from "next/navigation";
 
+/**
+ * Tela de autenticação da empresa.
+ *
+ * Permite que empresas cadastradas acessem a plataforma utilizando
+ * e-mail e senha. As validações básicas são realizadas no cliente
+ * antes do envio para a API, reduzindo requisições inválidas.
+ *
+ * Fluxo: valida campos -> autentica na API -> armazena credenciais
+ * localmente -> redireciona para o dashboard.
+ */
 export default function Home() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const router = useRouter();
+
+  /**
+   * Executa o processo de login da empresa.
+   *
+   * Valida os dados informados, envia as credenciais para a API
+   * de autenticação e, em caso de sucesso, armazena o token JWT
+   * e os dados da empresa no navegador.
+   *
+   * Após a autenticação, o usuário é redirecionado para o dashboard.
+   */
   const handleSubmit = async () => {
     setErrorMessage("");
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    const emailFormatado = email.trim().toLowerCase();
+
+    // Validação do formato do e-mail
+    if (!emailRegex.test(emailFormatado)) {
+      setErrorMessage("Digite um e-mail válido");
+      return;
+    }
+
+    // Verifica se o e-mail foi informado
     if (!email.trim()) {
       setErrorMessage("E-mail é obrigatório");
       return;
     }
 
+    // Verifica se a senha foi informada
     if (!password.trim()) {
       setErrorMessage("Senha é obrigatória");
       return;
     }
 
-    console.log({
-      email,
-      password,
-    });
+    // Exige uma senha com no mínimo 8 caracteres
+    if (password.length < 8) {
+      setErrorMessage("A senha precisa ter no míninimo 8 caracteres");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const result = await LoginCompany({
+        email,
+        password,
+      });
+
+      console.log("Login realizado com sucesso!");
+      console.log(result);
+
+      // Persiste os dados de autenticação para uso na aplicação
+      localStorage.setItem("token", result.token);
+      localStorage.setItem("company", JSON.stringify(result.company));
+
+      // Mantém o loading até a navegação para o dashboard
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 1500);
+    } catch (error) {
+      if (error instanceof Error) {
+        setErrorMessage(error.message);
+      } else {
+        setErrorMessage("Ocorreu um erro inesperado");
+      }
+
+      setLoading(false);
+    }
   };
+
   return (
     <main className="flex flex-col justify-center md:flex-row w-full min-h-screen bg-[#0a0a0a] text-white font-syne">
-      <aside className="  bg-[#111111] p-4 md:p-10 w-full md:w-[70%] xs:p-8">
+      <aside className="bg-[#111111] p-4 md:p-10 w-full md:w-[70%] xs:p-8">
         <Link href="/" className="md:hidden">
-          <House
-            size={24}
-            className="absolute  top-8 right-8 cursor-pointer "
-          />
+          <House size={24} className="absolute top-8 right-8 cursor-pointer" />
         </Link>
-        <div className="flex flex-col aside-container justify-center  h-[90%]">
+
+        <div className="flex flex-col aside-container justify-center h-[90%]">
           <p className="text-[#555555] text-base lg:text-xl mt-5 mb-20">
             ◆ FeedBack Platform
           </p>
 
           <TextAnimate />
 
-          <p className=" mt-10 mb-40 text-center text-[#A0A0A0] text-sm lg:text-xl lg:text-start">
+          <p className="mt-10 mb-40 text-center text-[#A0A0A0] text-sm lg:text-xl lg:text-start">
             Feedbacks anônimos e honestos. Transforme cultura com dados reais.
           </p>
 
@@ -69,14 +133,19 @@ export default function Home() {
           </div>
         </div>
       </aside>
+
       <div className="w-full flex justify-center items-center bg-[#0a0a0a] relative">
         <Link href="/" className="hidden md:flex">
-          <House
-            size={24}
-            className="absolute  top-8 right-8 cursor-pointer "
-          />
+          <House size={24} className="absolute top-8 right-8 cursor-pointer" />
         </Link>
-        <form className="flex flex-col gap-4 w-full max-w-[600px] p-4">
+
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSubmit();
+          }}
+          className="flex flex-col gap-4 w-full max-w-[600px] p-4"
+        >
           <h2 className="text-xl mt-10 font-bold text-center mb-6 sm:text-2xl md:mt-0">
             Entrar na Plataforma
           </h2>
@@ -89,6 +158,7 @@ export default function Home() {
 
           <div className="flex flex-col">
             <label className="text-[#555555] text-sm font-mono">EMAIL</label>
+
             <input
               type="text"
               placeholder="digite o email..."
@@ -101,6 +171,7 @@ export default function Home() {
           <div className="flex flex-col md:flex-row gap-3">
             <div className="flex flex-col w-full">
               <label className="text-[#555555] text-sm font-mono">SENHA</label>
+
               <input
                 type="password"
                 placeholder="digite sua senha..."
@@ -110,13 +181,12 @@ export default function Home() {
               />
             </div>
           </div>
-          {errorMessage && (
-            <span className="text-red-400 ">{errorMessage}</span>
-          )}
+
+          {errorMessage && <span className="text-red-400">{errorMessage}</span>}
+
           <button
             disabled={loading}
-            type="button"
-            onClick={handleSubmit}
+            type="submit"
             className="mt-6 mb-2 px-4 py-2 cursor-pointer rounded-md bg-[#c7f464] text-black font-semibold hover:opacity-90 transition"
           >
             {loading ? "Entrando..." : "Entrar →"}

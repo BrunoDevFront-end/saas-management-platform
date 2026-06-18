@@ -1,13 +1,14 @@
 import { Router } from "express";
 import { feedbackController } from "../controllers/feedbackController";
 import { authMiddleware } from "../middlewares/authMiddleware";
+import { feedbackLimiter } from "../middlewares/rateLimiters";
 
 const router = Router();
 
-// Rota PÚBLICA — funcionário envia feedback pelo slug da empresa
-router.post("/public/:slug", feedbackController.create);
+/** Rota pública — funcionário envia feedback anônimo via slug da empresa. */
+router.post("/public/:slug", feedbackLimiter, feedbackController.create);
 
-// Rota PRIVADA — admin lista feedbacks de um form
+/** Rota privada — admin autenticado lista feedbacks de um form específico. */
 router.get("/:formId", authMiddleware, feedbackController.list);
 
 export default router;

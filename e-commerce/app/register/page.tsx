@@ -8,6 +8,16 @@ import Link from "next/link";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
+/**
+ * Tela de cadastro de empresas.
+ *
+ * Realiza validações no cliente antes de enviar os dados para a API,
+ * reduzindo requisições inválidas e melhorando a experiência do usuário.
+ *
+ * Fluxo: valida campos -> envia cadastro -> exibe feedback visual
+ * -> redireciona para login após sucesso.
+ */
+
 export default function Home() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -18,13 +28,20 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
+  /**
+   * Executa o processo de cadastro da empresa.
+   *
+   * Valida os campos obrigatórios, verifica formato de e-mail,
+   * força a política de senha definida pela aplicação e envia
+   * os dados para a API de registro.
+   *
+   * Em caso de sucesso, exibe uma notificação e redireciona
+   * para a página de login.
+   */
   const handleSubmit = async () => {
     setErrorMessage("");
 
-    //VALIDATION
-
-    //NAME
-
+    // Validação do nome
     if (!name.trim()) {
       setErrorMessage("Nome é obrigatório!");
       return;
@@ -35,8 +52,7 @@ export default function Home() {
       return;
     }
 
-    //EMAIL
-
+    // Validação do e-mail
     if (!email.trim()) {
       setErrorMessage("E-mail é obrigatório");
       return;
@@ -45,27 +61,28 @@ export default function Home() {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     const emailFormatado = email.trim().toLowerCase();
+
     if (!emailRegex.test(emailFormatado)) {
       setErrorMessage("Digite um e-mail válido");
       return;
     }
 
-    //SEGMENT
-
+    // Validação do segmento
     if (!segment) {
       setErrorMessage("Selecione um segmento!");
       return;
     }
 
-    //PASSWORD
-
+    // Validação da senha
     const passwordRegex =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
     if (!password.trim()) {
       setErrorMessage("Senha é obrigatória");
       return;
     }
 
+    // Mantém a mesma regra de complexidade aplicada no backend
     if (!passwordRegex.test(password)) {
       setErrorMessage(
         "A senha deve conter no mínimo 8 caracteres, uma letra maiúscula, uma minúscula, um número e um caractere especial",
@@ -73,26 +90,28 @@ export default function Home() {
       return;
     }
 
-    if (password != confirmPassword) {
+    // Confirmação de senha
+    if (password !== confirmPassword) {
       setErrorMessage("As senhas não coincidem");
       return;
     }
 
     setLoading(true);
-
+    const toastID = toast.loading("Criando conta...");
     try {
-      toast.loading("Criando conta...");
       const data = await registerCompany({
         name: name.trim(),
         email: email.trim().toLowerCase(),
         segment,
         password,
       });
-      toast.dismiss();
+
+      toast.dismiss(toastID);
       toast.success("Empresa cadastrada com sucesso!");
 
+      // Aguarda a exibição da mensagem antes do redirecionamento
       setTimeout(() => {
-        router.push("/");
+        router.push("/login");
       }, 1500);
 
       console.log(data);
@@ -101,8 +120,10 @@ export default function Home() {
         setErrorMessage(error.message);
       } else {
         setErrorMessage("Ocorreu um erro inesperado");
+        toast.error("Ocorreu um erro inesperado");
       }
     } finally {
+      toast.dismiss(toastID);
       setLoading(false);
     }
   };
@@ -153,7 +174,13 @@ export default function Home() {
             className="absolute  top-8 right-8 cursor-pointer "
           />
         </Link>
-        <form className="flex flex-col gap-4 w-full max-w-[600px] p-4">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSubmit();
+          }}
+          className="flex flex-col gap-4 w-full max-w-[600px] p-4"
+        >
           <h2 className="text-xl mt-10 font-bold text-center mb-6 sm:text-2xl md:mt-0">
             Cadastre sua Empresa
           </h2>
@@ -235,8 +262,7 @@ export default function Home() {
           )}
           <button
             disabled={loading}
-            type="button"
-            onClick={handleSubmit}
+            type="submit"
             className="mt-6 mb-2 px-4 py-2 cursor-pointer rounded-md bg-[#c7f464] text-black font-semibold hover:opacity-90 transition"
           >
             {loading ? "Criando..." : "Criar conta →"}

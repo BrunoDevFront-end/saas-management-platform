@@ -1,35 +1,68 @@
 import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
+import { z } from "zod";
 import prisma from "../prisma/client";
 import jwt from "jsonwebtoken";
 
-// Gera um slug a partir do nome da empresa
-// Ex: "Minha Empresa" → "minha-empresa"
+/**
+ * Gera um slug único a partir do nome da empresa.
+ * Remove acentos, caracteres especiais e espaços (ex: "Café & Cia" -> "cafe-cia").
+ * Usado na rota pública de feedback (/feedbacks/public/:slug).
+ */
 function generateSlug(name: string): string {
   return name
     .toLowerCase()
-    .normalize("NFD") // separa letras de acentos
-    .replace(/[\u0300-\u036f]/g, "") // remove os acentos
-    .replace(/[^a-z0-9\s]/g, "") // remove caracteres especiais
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9\s]/g, "")
     .trim()
-    .replace(/\s+/g, "-"); // substitui espaços por hífen
+    .replace(/\s+/g, "-");
 }
 
+// Mesma regra de complexidade exigida no frontend (página de registro):
+// mínimo 8 caracteres, 1 maiúscula, 1 minúscula, 1 número e 1 caractere especial.
+const passwordRegex =
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+/**
+ * Regras de validação do cadastro de empresa.
+ * Validado no backend independentemente do frontend, já que a API
+ * pode ser chamada diretamente (Postman, curl, etc.) — sem isso, alguém
+ * poderia criar uma conta com senha fraca contornando o formulário.
+ */
+const registerSchema = z.object({
+  name: z.string().trim().min(2, "Nome precisa ter no mínimo 2 caracteres"),
+  email: z.string().trim().email("Digite um e-mail válido"),
+  password: z
+    .string()
+    .max(72, "Senha muito longa") // bcrypt ignora bytes após o 72º
+    .regex(
+      passwordRegex,
+      "A senha deve conter no mínimo 8 caracteres, uma letra maiúscula, uma minúscula, um número e um caractere especial",
+    ),
+  segment: z.string().trim().optional(),
+});
+
 export const companyController = {
+  /**
+   * POST /companies/register
+   * Cadastra uma nova empresa. Rota pública.
+   *
+   * Fluxo: valida payload -> checa e-mail duplicado -> gera slug único
+   * -> hash da senha -> persiste -> retorna dados (sem a senha).
+   */
   async register(req: Request, res: Response) {
     try {
-      const { name, email, password, segment } = req.body;
+      const parsed = registerSchema.safeParse(req.body);
 
-      const normalizedEmail = email.trim().toLowerCase();
-
-      // 1. Valida se todos os campos foram enviados
-      if (!name || !email || !password) {
-        return res
-          .status(400)
-          .json({ error: "Nome, email e senha são obrigatórios" });
+      if (!parsed.success) {
+        const firstError = parsed.error.issues[0]?.message ?? "Dados inválidos";
+        return res.status(400).json({ error: firstError });
       }
 
-      // 2. Verifica se o email já está cadastrado
+      const { name, email, password, segment } = parsed.data;
+      const normalizedEmail = email.toLowerCase();
+
       const emailExists = await prisma.company.findUnique({
         where: { email: normalizedEmail },
       });
@@ -38,23 +71,21 @@ export const companyController = {
         return res.status(409).json({ error: "Email já cadastrado" });
       }
 
-      // 3. Gera o slug e verifica se já existe
       let slug = generateSlug(name);
 
       const slugExists = await prisma.company.findUnique({
         where: { slug },
       });
 
-      // Se o slug já existir, adiciona um número aleatório no final
+      // Colisão de slug (nomes de empresa iguais ou muito parecidos):
+      // resolve anexando um número aleatório.
       if (slugExists) {
         slug = `${slug}-${Math.floor(Math.random() * 9999)}`;
       }
 
-      // 4. Criptografa a senha — o número 10 é o "salt rounds"
-      // quanto maior, mais seguro mas mais lento. 10 é o padrão ideal
+      // Salt rounds 10: padrão recomendado pelo bcrypt (custo/segurança equilibrados).
       const passwordHash = await bcrypt.hash(password, 10);
 
-      // 5. Salva a empresa no banco
       const company = await prisma.company.create({
         data: {
           name,
@@ -65,7 +96,6 @@ export const companyController = {
         },
       });
 
-      // 6. Retorna os dados sem expor a senha
       return res.status(201).json({
         id: company.id,
         name: company.name,
@@ -79,32 +109,32 @@ export const companyController = {
     }
   },
 
+  /**
+   * POST /companies/login
+   * Autentica uma empresa e retorna um JWT (expira em 7 dias).
+   * Erros de "email não existe" e "senha errada" retornam a mesma mensagem
+   * genérica, para não permitir enumeração de e-mails cadastrados.
+   */
   async login(req: Request, res: Response) {
     try {
       const { email, password } = req.body;
-      const normalizedEmail = email.trim().toLowerCase();
 
-      // 1. Valida se os campos foram enviados
       if (!email || !password) {
         return res
           .status(400)
           .json({ error: "Email e senha são obrigatórios" });
       }
 
-      // 2. Busca a empresa no banco pelo email
+      const normalizedEmail = String(email).trim().toLowerCase();
+
       const company = await prisma.company.findUnique({
         where: { email: normalizedEmail },
       });
 
-      // 3. Se não encontrar, retorna erro genérico
-      // Não falamos "email não existe" por segurança — evita que alguém
-      // descubra quais emails estão cadastrados
       if (!company) {
         return res.status(401).json({ error: "Email ou senha inválidos" });
       }
 
-      // 4. Compara a senha digitada com o hash salvo no banco
-      // O bcrypt pega a senha pura, criptografa do mesmo jeito e compara
       const passwordMatch = await bcrypt.compare(
         password,
         company.passwordHash,
@@ -114,16 +144,12 @@ export const companyController = {
         return res.status(401).json({ error: "Email ou senha inválidos" });
       }
 
-      // 5. Gera o token JWT
-      // O token carrega o id e email da empresa — chamamos isso de "payload"
-      // O JWT_SECRET é a chave que assina o token — só quem tem ela consegue validar
       const token = jwt.sign(
         { id: company.id, email: company.email },
         process.env.JWT_SECRET as string,
-        { expiresIn: "7d" }, // token expira em 7 dias
+        { expiresIn: "7d" },
       );
 
-      // 6. Retorna o token e dados básicos da empresa
       return res.status(200).json({
         token,
         company: {

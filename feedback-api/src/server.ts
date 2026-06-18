@@ -12,7 +12,20 @@ const app = express();
 
 app.use(express.json());
 
-app.use(cors());
+/**
+ * CORS restrito à origem do frontend.
+ * Em dev usa http://localhost:3000 por padrão; em produção, definir
+ * FRONTEND_URL no .env com a URL real (ex: https://meudominio.com).
+ */
+const allowedOrigin = process.env.FRONTEND_URL || "http://localhost:3000";
+
+app.use(
+  cors({
+    origin: allowedOrigin,
+    methods: ["GET", "POST", "PATCH", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  }),
+);
 
 app.get("/health", (req, res) => {
   res.json({ status: "API rodando!" });

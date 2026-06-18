@@ -2,7 +2,10 @@ import { Request, Response } from "express";
 import prisma from "../prisma/client";
 
 export const formController = {
-  // Cria um novo formulário
+  /**
+   * POST /forms
+   * Cria um novo formulário para a empresa autenticada. Rota privada.
+   */
   async create(req: Request, res: Response) {
     try {
       const { title, description } = req.body;
@@ -29,14 +32,17 @@ export const formController = {
     }
   },
 
-  // Lista todos os formulários da empresa logada
+  /**
+   * GET /forms
+   * Lista os formulários da empresa autenticada, incluindo a contagem
+   * de feedbacks recebidos por cada um.
+   */
   async list(req: Request, res: Response) {
     try {
       const companyId = req.company!.id;
 
       const forms = await prisma.form.findMany({
         where: { companyId },
-        // Conta quantos feedbacks cada form tem
         include: {
           _count: {
             select: { feedbacks: true },
@@ -52,13 +58,18 @@ export const formController = {
     }
   },
 
-  // Ativa ou desativa um formulário
+  /**
+   * PATCH /forms/:id/toggle
+   * Ativa ou desativa um formulário (toggle do campo isActive).
+   * Um formulário inativo deixa de aceitar novos feedbacks (ver feedbackController.create),
+   * mas os feedbacks já recebidos permanecem disponíveis.
+   * Só afeta formulários que pertencem à empresa autenticada.
+   */
   async toggleActive(req: Request, res: Response) {
     try {
       const id = String(req.params.id);
       const companyId = req.company!.id;
 
-      // Verifica se o form existe e pertence à empresa logada
       const form = await prisma.form.findFirst({
         where: { id, companyId },
       });
@@ -67,7 +78,6 @@ export const formController = {
         return res.status(404).json({ error: "Formulário não encontrado" });
       }
 
-      // Inverte o estado atual — se estava ativo vira inativo e vice-versa
       const updated = await prisma.form.update({
         where: { id },
         data: { isActive: !form.isActive },

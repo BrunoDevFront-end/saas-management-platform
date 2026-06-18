@@ -1,10 +1,14 @@
 import { Router } from "express";
 import { companyController } from "../controllers/companyController";
+import { loginLimiter, registerLimiter } from "../middlewares/rateLimiters";
 
 const router = Router();
 
-// Rota pública — qualquer um pode se cadastrar
-router.post("/register", companyController.register);
-router.post("/login", companyController.login);
+/**
+ * Rotas de autenticação/cadastro de empresa.
+ * Ambas públicas — não passam por authMiddleware.
+ */
+router.post("/register", registerLimiter, companyController.register);
+router.post("/login", loginLimiter, companyController.login);
 
 export default router;
