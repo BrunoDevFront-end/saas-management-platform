@@ -8,8 +8,8 @@
   --greenSpan: #c8f55a;
   --textSecondary: #555555;
   --lightGray: #1e1e1e;
-  --GrayEdges: #4b4b4b;
-  --textPlaceholder: #666666;
+  --GrayEdges: #222222;
+  --textPlaceholder: #747474;
   --textInput: #f0ede6ce;
 }
 
@@ -21,6 +21,7 @@
   --font-syne: "Syne", sans-serif;
   --font-syne-mono: "Syne Mono", monospace;
   --breakpoint-xs: 480px;
+  --font-inter: var(--font-inter);
 }
 
 body {
@@ -28,4 +29,10 @@ body {
   color: var(--foreground);
   font-family: var(--font-syne);
   min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+strong {
+  font-family: "inter";
 }

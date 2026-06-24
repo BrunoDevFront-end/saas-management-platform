@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Syne, Syne_Mono } from "next/font/google";
 import { Toaster } from "sonner";
+import { Inter } from "next/font/google";
 
 const syne = Syne({
   subsets: ["latin"],
@@ -14,6 +15,11 @@ const syneMono = Syne_Mono({
   subsets: ["latin"],
   weight: ["400"],
   variable: "--font-syne-mono",
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
 });
 
 const geistSans = Geist({
@@ -39,9 +45,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${syne.variable} ${syneMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${syne.variable}  ${inter.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col justify-center items-center font-syne ">
+      <body className="min-h-screen w-full font-syne  ">
         {children}
         <Toaster richColors position="top-right" />
       </body>
