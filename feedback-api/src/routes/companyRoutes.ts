@@ -1,14 +1,21 @@
 import { Router } from "express";
 import { companyController } from "../controllers/companyController";
 import { loginLimiter, registerLimiter } from "../middlewares/rateLimiters";
+import { authMiddleware } from "../middlewares/authMiddleware";
 
 const router = Router();
 
 /**
  * Rotas de autenticação/cadastro de empresa.
- * Ambas públicas — não passam por authMiddleware.
+ * Públicas — não passam por authMiddleware.
  */
 router.post("/register", registerLimiter, companyController.register);
 router.post("/login", loginLimiter, companyController.login);
+
+/**
+ * GET /companies/stats
+ * Retorna estatísticas agregadas da empresa autenticada. Rota privada.
+ */
+router.get("/stats", authMiddleware, companyController.stats);
 
 export default router;

@@ -44,6 +44,38 @@ const registerSchema = z.object({
 });
 
 export const companyController = {
+  async stats(req: Request, res: Response) {
+    try {
+      const companyId = req.company!.id;
+      const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+      const [activeForms, totalFeedbacks, feedbacksLast7Days] =
+        await Promise.all([
+          prisma.form.count({
+            where: { companyId, isActive: true },
+          }),
+          prisma.feedback.count({
+            where: { form: { companyId } },
+          }),
+          prisma.feedback.count({
+            where: {
+              form: { companyId },
+              createdAt: { gte: sevenDaysAgo },
+            },
+          }),
+        ]);
+
+      return res.status(200).json({
+        activeForms,
+        totalFeedbacks,
+        feedbacksLast7Days,
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  },
+
   /**
    * POST /companies/register
    * Cadastra uma nova empresa. Rota pública.
