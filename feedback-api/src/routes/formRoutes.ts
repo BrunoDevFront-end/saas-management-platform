@@ -10,6 +10,7 @@ router.use(authMiddleware);
 
 router.post("/", formController.create);
 router.get("/", formController.list);
+
 router.patch("/:id/toggle", formController.toggleActive);
 
 export default router;

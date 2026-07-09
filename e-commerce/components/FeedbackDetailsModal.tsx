@@ -10,12 +10,14 @@ interface ModalOpen {
   formId: string;
   isModalOpen: boolean;
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  onFeedbackDeleted: (formId: string) => void;
 }
 
 export default function FeedbackDetailsModal({
   setIsModalOpen,
   isModalOpen,
   formId,
+  onFeedbackDeleted,
 }: ModalOpen) {
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
   const [loading, setLoading] = useState(true);
@@ -57,7 +59,14 @@ export default function FeedbackDetailsModal({
         </header>
         <ul className="mx-4 my-5">
           {feedbacks?.map((feedback) => (
-            <FeedbackItem key={feedback.id} feedback={feedback} />
+            <FeedbackItem
+              key={feedback.id}
+              feedback={feedback}
+              onDeleted={(id) => {
+                setFeedbacks((prev) => prev.filter((f) => f.id !== id));
+                onFeedbackDeleted(formId);
+              }}
+            />
           ))}
           {!feedbacks.length && (
             <p className="text-xl text-center mt-20 text-[var(--textPlaceholder)]">

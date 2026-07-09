@@ -7,11 +7,13 @@ import FeedbackFormItem from "@/components/feedbackFormItem";
 import { useEffect } from "react";
 import { toggleForm } from "@/components/request";
 import { getCompanyStats, CompanyStats } from "@/components/request";
+import CreateFormModal from "@/components/CreateFormModal";
 
 export default function Page() {
   const [forms, setForms] = useState<Form[]>([]);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<CompanyStats | null>(null);
+  const [openModalFrom, setopenModalForm] = useState(false);
 
   useEffect(() => {
     async function loadForms() {
@@ -55,6 +57,30 @@ export default function Page() {
     }
   };
 
+  const handleFeedbackDeleted = (formId: string) => {
+    setForms((prev) =>
+      prev.map((form) =>
+        form.id === formId && form._count
+          ? {
+              ...form,
+              _count: {
+                ...form._count,
+                feedbacks: form._count.feedbacks - 1,
+              },
+            }
+          : form,
+      ),
+    );
+    setStats((prev) =>
+      prev
+        ? {
+            ...prev,
+            totalFeedbacks: prev.totalFeedbacks - 1,
+          }
+        : prev,
+    );
+  };
+
   const activeFormsCount = forms.filter((form) => form.isActive).length;
 
   return (
@@ -92,7 +118,10 @@ export default function Page() {
               dizendo — sem filtro, sem identificação.{" "}
             </p>
           </div>
-          <button className="bg-[var(--greenSpan)] text-black font-bold text-[14px] p-2 w-full font-inter md:w-40 md:h-10 md:self-end cursor-pointer">
+          <button
+            onClick={() => setopenModalForm(true)}
+            className="bg-[var(--greenSpan)] text-black font-bold text-[14px] p-2 w-full font-inter md:w-40 md:h-10 md:self-end cursor-pointer hover:scale-[1.02] hover:shadow-[0_0_15px_var(--greenSpan)] transition-all duration-200"
+          >
             + novo formulário
           </button>
         </section>
@@ -151,12 +180,19 @@ export default function Page() {
               key={form.id}
               form={form}
               onToggle={handleToggle}
+              onFeedbackDeleted={handleFeedbackDeleted}
             />
           ))}
         </ul>
         <button className="p-4 mb-8 mt-10 w-full text-[var(--textSecondary)] border-2 border-[var(--GrayEdges)] border-dashed font-mono ">
           criar novo formulário de feedback
         </button>
+        {openModalFrom && (
+          <CreateFormModal
+            setopenModalForm={setopenModalForm}
+            openModalForm={openModalFrom}
+          />
+        )}
       </main>
     </div>
   );

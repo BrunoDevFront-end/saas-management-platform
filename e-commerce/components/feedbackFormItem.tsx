@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import FeedbackDetailsModal from "./FeedbackDetailsModal";
 import type { Form } from "@/components/request";
@@ -6,13 +6,16 @@ import type { Form } from "@/components/request";
 interface FeedbackItemProps {
   form: Form;
   onToggle: (id: string) => void;
+  onFeedbackDeleted: (formId: string) => void;
 }
 
 export default function FeedbackFormItem({
   form,
   onToggle,
+  onFeedbackDeleted,
 }: FeedbackItemProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+
   return (
     <li>
       <article className="flex flex-col font-inter bg-[var(--backgroundSecondary)] p-6 mb-1 border-1 border-[var(--GrayEdges)] xl:grid xl:grid-cols-5 xl:grid-cols-[40%_15%_15%_15%_15%] xl:items-center">
@@ -69,6 +72,7 @@ export default function FeedbackFormItem({
           formId={form.id}
           setIsModalOpen={setIsModalOpen}
           isModalOpen={isModalOpen}
+          onFeedbackDeleted={onFeedbackDeleted}
         />
       )}
     </li>

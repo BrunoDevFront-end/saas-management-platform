@@ -101,6 +101,29 @@ export async function toggleForm(formId: string) {
     handleNetworkError(error);
   }
 }
+export async function deleteFeedback(feedbackId: string) {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/feedbacks/${feedbackId}`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      },
+    );
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error);
+    }
+
+    return result;
+  } catch (error) {
+    handleNetworkError(error);
+  }
+}
 
 export async function getCompanyStats(): Promise<CompanyStats> {
   try {
