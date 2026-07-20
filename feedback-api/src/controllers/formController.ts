@@ -2,6 +2,37 @@ import { Request, Response } from "express";
 import prisma from "../prisma/client";
 
 export const formController = {
+  async publicShow(req: Request, res: Response) {
+    try {
+      const formId = String(req.params.formId);
+
+      const form = await prisma.form.findFirst({
+        where: { id: formId, isActive: true },
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          company: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      });
+
+      if (!form) {
+        return res
+          .status(404)
+          .json({ error: "Formulário não encontrado ou inativo" });
+      }
+
+      return res.status(200).json(form);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  },
+
   /**
    * POST /forms
    * Cria um novo formulário para a empresa autenticada. Rota privada.
@@ -26,6 +57,30 @@ export const formController = {
       });
 
       return res.status(201).json(form);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  },
+
+  async delete(req: Request, res: Response) {
+    try {
+      const id = String(req.params.id);
+      const companyId = req.company!.id;
+
+      const form = await prisma.form.findFirst({
+        where: { id, companyId },
+      });
+
+      if (!form) {
+        return res.status(404).json({ error: "Formulário não encontrado" });
+      }
+
+      const updated = await prisma.form.delete({
+        where: { id },
+      });
+
+      return res.status(200).json(updated);
     } catch (error) {
       console.error(error);
       return res.status(500).json({ error: "Erro interno do servidor" });

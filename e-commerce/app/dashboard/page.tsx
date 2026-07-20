@@ -1,19 +1,35 @@
 "use client";
 
-import { Form, getForms } from "@/components/request";
+import {
+  deleteForm,
+  Form,
+  getForms,
+  getStoredCompany,
+} from "@/components/request";
 import React from "react";
 import { useState } from "react";
 import FeedbackFormItem from "@/components/feedbackFormItem";
 import { useEffect } from "react";
 import { toggleForm } from "@/components/request";
 import { getCompanyStats, CompanyStats } from "@/components/request";
+import { Company } from "@/components/request";
 import CreateFormModal from "@/components/CreateFormModal";
+import { CompanyPublicLink } from "@/components/CompanyPublicLink";
+import FeedbackDetailsModal from "@/components/FeedbackDetailsModal";
 
 export default function Page() {
   const [forms, setForms] = useState<Form[]>([]);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<CompanyStats | null>(null);
-  const [openModalFrom, setopenModalForm] = useState(false);
+  const [openModalForm, setopenModalForm] = useState(false);
+  const [selectedForm, setSelectedForm] = useState<Form | null>(null);
+  const [erro, setErro] = useState("");
+  const [company, setCompany] = useState<Company | null>(null);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setCompany(getStoredCompany());
+  }, []);
 
   useEffect(() => {
     async function loadForms() {
@@ -42,6 +58,15 @@ export default function Page() {
 
     loadStats();
   }, []);
+
+  useEffect(() => {
+    document.body.style.overflow =
+      openModalForm || selectedForm !== null ? "hidden" : "auto";
+
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [openModalForm, selectedForm]);
 
   const handleToggle = async (id: string) => {
     try {
@@ -81,6 +106,22 @@ export default function Page() {
     );
   };
 
+  function handleFormCreated(newForm: Form) {
+    setForms((prevForms) => [newForm, ...prevForms]);
+  }
+  async function handleFormDeleted(deleteId: string) {
+    try {
+      await deleteForm(deleteId);
+      setForms((prevForms) => prevForms.filter((form) => form.id !== deleteId));
+    } catch (error) {
+      if (error instanceof Error) {
+        setErro(error.message);
+      } else {
+        setErro("Não foi possível deletar esse formulário!");
+      }
+    }
+  }
+
   const activeFormsCount = forms.filter((form) => form.isActive).length;
 
   return (
@@ -98,7 +139,7 @@ export default function Page() {
             empresa:
           </span>
           <strong className="hidden md:flex mr-8 items-center text-sm text-[var(--textTitles)]">
-            Nimbus Tech
+            {company?.name ?? "..."}
           </strong>
 
           <button className="cursor-pointer transition-colors hover:text-[var(--greenSpan)] hover:border-b-[var(--greenSpan)] px-4 py-1 border-1 border-[var(--GrayEdges)]   font-syne-mono text-center text-[var(--textSecondary)]">
@@ -106,6 +147,14 @@ export default function Page() {
           </button>
         </div>
       </header>
+      {company && (
+        <div>
+          <span className="mx-4 xl:mx-15 text-[var(--textPlaceholder)]">
+            Link público de acesso aos formulários
+          </span>
+          <CompanyPublicLink slug={company.slug} />
+        </div>
+      )}
       <main className="flex flex-col items-center mx-4 xl:mx-15">
         <section className=" flex flex-col  my-8 w-full md:flex-row md:justify-between md:gap-7">
           <div>
@@ -180,17 +229,28 @@ export default function Page() {
               key={form.id}
               form={form}
               onToggle={handleToggle}
+              setSelectedForm={setSelectedForm}
               onFeedbackDeleted={handleFeedbackDeleted}
+              onDeleteForm={handleFormDeleted}
             />
           ))}
         </ul>
+
+        {selectedForm && (
+          <FeedbackDetailsModal
+            form={selectedForm}
+            onClose={() => setSelectedForm(null)}
+            onFeedbackDeleted={handleFeedbackDeleted}
+          />
+        )}
+
         <button className="p-4 mb-8 mt-10 w-full text-[var(--textSecondary)] border-2 border-[var(--GrayEdges)] border-dashed font-mono ">
           criar novo formulário de feedback
         </button>
-        {openModalFrom && (
+        {openModalForm && (
           <CreateFormModal
             setopenModalForm={setopenModalForm}
-            openModalForm={openModalFrom}
+            onFormCreated={handleFormCreated}
           />
         )}
       </main>

@@ -11,7 +11,7 @@ const router = Router();
  */
 router.post("/register", registerLimiter, companyController.register);
 router.post("/login", loginLimiter, companyController.login);
-
+router.get("/public/:slug", companyController.publicShow);
 /**
  * GET /companies/stats
  * Retorna estatísticas agregadas da empresa autenticada. Rota privada.

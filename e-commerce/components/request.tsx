@@ -10,6 +10,11 @@ interface LoginCompany {
   password: string;
 }
 
+interface CreateForm {
+  title: string;
+  description: string;
+}
+
 export interface Form {
   id: string;
   title: string;
@@ -28,16 +33,73 @@ export interface Feedback {
   createdAt: string;
 }
 
+export interface CreateFeedback {
+  slug: string;
+  content: string;
+  formId: string;
+}
+
 export interface CompanyStats {
   activeForms: number;
   totalFeedbacks: number;
   feedbacksLast7Days: number;
+}
+export interface Company {
+  id: string;
+  name: string;
+  slug: string;
+  email: string;
+}
+
+export interface PublicForm {
+  id: string;
+  title: string;
+  description: string | null;
+  company: {
+    name: string;
+  };
 }
 
 export type FeedbackList = Feedback[];
 
 function getToken() {
   return localStorage.getItem("token");
+}
+
+export async function GetPublicForm(formId: string): Promise<PublicForm> {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/forms/public/${formId}`,
+      {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      },
+    );
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || "Erro ao buscar formulário");
+    }
+
+    return result;
+  } catch (error) {
+    handleNetworkError(error);
+    throw error;
+  }
+}
+
+export function getStoredCompany(): Company | null {
+  if (typeof window === "undefined") return null; // guarda pra SSR/build
+
+  const raw = localStorage.getItem("company");
+  if (!raw) return null;
+
+  try {
+    return JSON.parse(raw) as Company;
+  } catch {
+    return null;
+  }
 }
 
 export async function getForms(): Promise<Form[]> {
@@ -59,6 +121,31 @@ export async function getForms(): Promise<Form[]> {
     handleNetworkError(error);
   }
 }
+
+export async function GetPublicCompanyForms(slug: string) {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/companies/public/${slug}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    );
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || "Erro ao buscar formulários da empresa");
+    }
+
+    return result;
+  } catch (error) {
+    handleNetworkError(error);
+  }
+}
+
 export async function getFeddbacks(formId: string): Promise<Feedback[]> {
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}/feedbacks/${formId}`,
@@ -78,12 +165,41 @@ export async function getFeddbacks(formId: string): Promise<Feedback[]> {
   return result;
 }
 
-export async function toggleForm(formId: string) {
+export async function CreateFeedback({
+  content,
+  slug,
+  formId,
+}: CreateFeedback) {
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/forms/${formId}/toggle`,
+      `${process.env.NEXT_PUBLIC_API_URL}/feedbacks/public/${slug}`,
       {
-        method: "PATCH",
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ content, formId }),
+      },
+    );
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || "Erro ao cadastrar empresa");
+    }
+
+    return result;
+  } catch (error) {
+    handleNetworkError(error);
+  }
+}
+
+export async function deleteFeedback(feedbackId: string) {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/feedbacks/${feedbackId}`,
+      {
+        method: "DELETE",
         headers: {
           Authorization: `Bearer ${getToken()}`,
         },
@@ -101,12 +217,13 @@ export async function toggleForm(formId: string) {
     handleNetworkError(error);
   }
 }
-export async function deleteFeedback(feedbackId: string) {
+
+export async function toggleForm(formId: string) {
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/feedbacks/${feedbackId}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/forms/${formId}/toggle`,
       {
-        method: "DELETE",
+        method: "PATCH",
         headers: {
           Authorization: `Bearer ${getToken()}`,
         },
@@ -211,6 +328,56 @@ export async function LoginCompany(data: LoginCompany) {
 
     if (!response.ok) {
       throw new Error(result.error || "Erro ao realizar login");
+    }
+
+    return result;
+  } catch (error) {
+    handleNetworkError(error);
+  }
+}
+
+// Cria um novo formulário
+
+export async function CreateNewForm(data: CreateForm) {
+  try {
+    const token = localStorage.getItem("token");
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/forms`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || "Erro ao realizar login");
+    }
+
+    return result;
+  } catch (error) {
+    handleNetworkError(error);
+  }
+}
+
+export async function deleteForm(deleteId: string) {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/forms/${deleteId}`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      },
+    );
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error);
     }
 
     return result;

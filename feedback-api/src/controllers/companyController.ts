@@ -77,6 +77,41 @@ export const companyController = {
   },
 
   /**
+   * GET /companies/public/:slug
+   * Retorna nome da empresa e formulários ativos. Rota pública —
+   * usada pela tela de listagem que o funcionário acessa via link.
+   */
+  async publicShow(req: Request, res: Response) {
+    try {
+      const slug = String(req.params.slug);
+
+      const company = await prisma.company.findUnique({
+        where: { slug },
+        select: {
+          name: true,
+          forms: {
+            where: { isActive: true },
+            select: {
+              id: true,
+              title: true,
+              description: true,
+            },
+          },
+        },
+      });
+
+      if (!company) {
+        return res.status(404).json({ error: "Empresa não encontrada" });
+      }
+
+      return res.status(200).json(company);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  },
+
+  /**
    * POST /companies/register
    * Cadastra uma nova empresa. Rota pública.
    *

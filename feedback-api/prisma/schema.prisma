@@ -38,5 +38,5 @@ model Feedback {
   createdAt DateTime @default(now())
 
   formId String
-  form   Form   @relation(fields: [formId], references: [id])
+  form   Form @relation(fields: [formId], references: [id], onDelete: Cascade)
 }
