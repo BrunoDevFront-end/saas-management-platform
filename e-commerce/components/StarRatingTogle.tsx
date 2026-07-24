@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Star } from "lucide-react"; // ou os ícones que você já usa
+import { Star } from "lucide-react";
 
 export function StarRatingToggle({
   enabled,

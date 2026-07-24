@@ -22,6 +22,7 @@ export default function CreatePublicFeedback() {
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [rating, setRating] = useState(0);
 
   useEffect(() => {
     async function fetchForm() {
@@ -31,6 +32,7 @@ export default function CreatePublicFeedback() {
         setErrorMessage("");
 
         const data = await GetPublicForm(formId);
+        console.log("FORM RECEBIDO:", data);
         setForm(data);
       } catch {
         setErrorMessage("Formulário não encontrado ou inativo.");
@@ -45,6 +47,8 @@ export default function CreatePublicFeedback() {
   async function handleForm(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
+    if (!form) return;
+
     if (!content.trim()) {
       setErrorMessage("Escreva um comentário.");
       return;
@@ -58,6 +62,7 @@ export default function CreatePublicFeedback() {
         content: content.trim(),
         slug,
         formId,
+        rating: form.activeRating ? rating : null,
       });
 
       setContent("");
@@ -123,11 +128,11 @@ export default function CreatePublicFeedback() {
           </div>
 
           <div className="hidden  md:block">
-            <span className="text-xs font-bold uppercase tracking-wide text-[var(--greenSpan)]">
+            <span className="text-sm font-bold font-inter uppercase tracking-wide text-[var(--greenSpan)]">
               100% Anônimo
             </span>
 
-            <p className="mt-2 text-xs leading-relaxed text-[var(--textPlaceholder)]">
+            <p className="mt-2 text-sm leading-relaxed text-[var(--textPlaceholder)]">
               Nenhum dado pessoal, IP ou identificador é coletado. É impossível
               rastrear sua resposta.
             </p>
@@ -147,28 +152,33 @@ export default function CreatePublicFeedback() {
             <div className="h-1 bg-[var(--greenSpan)]" />
           </div>
 
-          <h2 className="text-lg break-words font-bold leading-snug text-[var(--textTitles)] md:text-2xl md:break-all">
+          <h2 className="text-lg break-words mb-4 font-bold leading-snug text-[var(--textTitles)] md:text-2xl md:break-all">
             {form.description}
           </h2>
-
-          <div className="flex gap-1.5">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <button
-                key={star}
-                type="button"
-                className="cursor-pointer text-[var(--borders)]"
-              >
-                <Star
-                  size={45}
-                  className={
-                    star <= rating
-                      ? "fill-yellow-400 text-yellow-400"
-                      : "text-gray-400"
-                  }
-                />
-              </button>
-            ))}
-          </div>
+          {form?.activeRating && (
+            <fieldset>
+              <legend>Como você avalia? </legend>
+              <div className="flex gap-1.5 my-4">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    className="cursor-pointer text-[var(--borders)]"
+                    onClick={() => setRating(star)}
+                  >
+                    <Star
+                      size={45}
+                      className={
+                        star <= rating
+                          ? "fill-yellow-400 text-yellow-400"
+                          : "text-[var(--borders)]"
+                      }
+                    />
+                  </button>
+                ))}
+              </div>
+            </fieldset>
+          )}
 
           <div>
             <label
@@ -184,7 +194,7 @@ export default function CreatePublicFeedback() {
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder="Escreva aqui..."
-              className="w-full resize-none border border-[var(--GrayEdges)] bg-transparent p-3 text-sm text-[var(--textTitles)] focus:border-[var(--greenSpan)] focus:outline-none"
+              className="w-full resize-none border border-[var(--GrayEdges)] bg-transparent p-3 text-base text-[var(--textTitles)] focus:border-[var(--greenSpan)] focus:outline-none"
             />
           </div>
 

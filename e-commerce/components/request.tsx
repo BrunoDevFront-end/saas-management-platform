@@ -13,6 +13,7 @@ interface LoginCompany {
 interface CreateForm {
   title: string;
   description: string;
+  activeRating: boolean;
 }
 
 export interface Form {
@@ -20,6 +21,7 @@ export interface Form {
   title: string;
   description: string | null;
   isActive: boolean;
+  activeRating: boolean;
   createdAt: string;
 
   _count: {
@@ -31,12 +33,14 @@ export interface Feedback {
   id: string;
   content: string;
   createdAt: string;
+  rating: number;
 }
 
 export interface CreateFeedback {
   slug: string;
   content: string;
   formId: string;
+  rating: number | null;
 }
 
 export interface CompanyStats {
@@ -55,6 +59,7 @@ export interface PublicForm {
   id: string;
   title: string;
   description: string | null;
+  activeRating: boolean;
   company: {
     name: string;
   };
@@ -169,6 +174,7 @@ export async function CreateFeedback({
   content,
   slug,
   formId,
+  rating,
 }: CreateFeedback) {
   try {
     const response = await fetch(
@@ -178,7 +184,7 @@ export async function CreateFeedback({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ content, formId }),
+        body: JSON.stringify({ content, formId, rating }),
       },
     );
 
@@ -340,6 +346,7 @@ export async function LoginCompany(data: LoginCompany) {
 
 export async function CreateNewForm(data: CreateForm) {
   try {
+    console.log(data);
     const token = localStorage.getItem("token");
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/forms`, {
       method: "POST",

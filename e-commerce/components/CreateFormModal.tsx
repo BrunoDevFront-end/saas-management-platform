@@ -14,11 +14,11 @@ export default function CreateFormModal({
   setopenModalForm,
   onFormCreated,
 }: OpemModalForm) {
-  const [ratingEnabled, setRatingEnabled] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [activeRating, setActiveRating] = useState(true);
 
   async function handleCreateForm(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -44,6 +44,7 @@ export default function CreateFormModal({
       const data = await CreateNewForm({
         title: tituloFormatado,
         description: description.trim(),
+        activeRating,
       });
       onFormCreated(data);
       setopenModalForm(false);
@@ -130,8 +131,8 @@ export default function CreateFormModal({
           )}
           <section className="">
             <StarRatingToggle
-              enabled={ratingEnabled}
-              onChange={setRatingEnabled}
+              enabled={activeRating}
+              onChange={setActiveRating}
             />
           </section>
           <span className="flex  w-full h-0.5 bg-[var(--borders)] mx-auto mt-7"></span>

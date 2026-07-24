@@ -12,6 +12,7 @@ export const formController = {
           id: true,
           title: true,
           description: true,
+          activeRating: true,
           company: {
             select: {
               name: true,
@@ -39,7 +40,7 @@ export const formController = {
    */
   async create(req: Request, res: Response) {
     try {
-      const { title, description } = req.body;
+      const { title, description, activeRating } = req.body;
 
       // req.company vem do authMiddleware — já sabemos quem está logado
       const companyId = req.company!.id;
@@ -53,6 +54,7 @@ export const formController = {
           title,
           description,
           companyId,
+          activeRating,
         },
       });
 

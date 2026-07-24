@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { deleteFeedback, Feedback } from "./request";
 import { HiOutlineTrash } from "react-icons/hi";
+import { Star } from "lucide-react";
 
 interface FeedbackItemProps {
   feedback: Feedback;
@@ -38,8 +39,17 @@ export default function FeedbackItem({
 
   return (
     <li className="relative break-words p-4 mb-2 border-l-4 border-[var(--greenSpan)] text-lg text-[var(--textInput)] bg-[var(--borders)] rounded">
+      <div className="flex mb-4">
+        {Array.from({ length: feedback.rating }).map((_, i) => (
+          <Star
+            key={i}
+            size={15}
+            strokeWidth={1.5}
+            className="text-yellow-300 fill-current"
+          />
+        ))}
+      </div>
       {feedback.content}
-
       <div className="flex justify-between text-sm text-[var(--textSecondary)] pt-4">
         <span>Anônimo</span>
         <time className="text-sm font-syne-mono text-[var(--textSecondary)]">

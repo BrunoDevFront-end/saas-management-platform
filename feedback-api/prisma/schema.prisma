@@ -11,32 +11,30 @@ model Company {
   id           String   @id @default(uuid())
   name         String
   email        String   @unique
-  segment      String   @default("Outro")
   passwordHash String
   slug         String   @unique
   createdAt    DateTime @default(now())
-
-  forms Form[]
+  segment      String   @default("Outro")
+  forms        Form[]
 }
 
 model Form {
-  id          String   @id @default(uuid())
-  title       String
-  description String?
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-
-  companyId String
-  company   Company @relation(fields: [companyId], references: [id])
-
-  feedbacks Feedback[]
+  id           String     @id @default(uuid())
+  title        String
+  description  String?
+  isActive     Boolean    @default(true)
+  createdAt    DateTime   @default(now())
+  companyId    String
+  activeRating Boolean    @default(true)
+  feedbacks    Feedback[]
+  company      Company    @relation(fields: [companyId], references: [id])
 }
 
 model Feedback {
   id        String   @id @default(uuid())
   content   String
   createdAt DateTime @default(now())
-
-  formId String
-  form   Form @relation(fields: [formId], references: [id], onDelete: Cascade)
+  formId    String
+  rating    Int      @default(5)
+  form      Form     @relation(fields: [formId], references: [id], onDelete: Cascade)
 }
