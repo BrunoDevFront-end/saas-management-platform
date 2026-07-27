@@ -12,11 +12,7 @@ const app = express();
 
 app.use(express.json());
 
-/**
- * CORS restrito à origem do frontend.
- * Em dev usa http://localhost:3000 por padrão; em produção, definir
- * FRONTEND_URL no .env com a URL real (ex: https://meudominio.com).
- */
+// dev usa localhost:3000; em produção definir FRONTEND_URL no .env
 const allowedOrigin = process.env.FRONTEND_URL || "http://localhost:3000";
 
 app.use(

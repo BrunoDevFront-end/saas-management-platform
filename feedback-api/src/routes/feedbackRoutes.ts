@@ -5,11 +5,11 @@ import { feedbackLimiter } from "../middlewares/rateLimiters";
 
 const router = Router();
 
-/** Rota pública — funcionário envia feedback anônimo via slug da empresa. */
+// rota pública — funcionário envia feedback anônimo via slug da empresa
 router.post("/public/:slug", feedbackLimiter, feedbackController.create);
 
-/** Rota privada — admin autenticado lista feedbacks de um form específico. */
-router.delete("/:feedbackId", authMiddleware, feedbackController.deletar);
+// rotas privadas
 router.get("/:formId", authMiddleware, feedbackController.list);
+router.delete("/:feedbackId", authMiddleware, feedbackController.deletar);
 
 export default router;

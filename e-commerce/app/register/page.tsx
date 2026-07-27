@@ -197,6 +197,26 @@ export default function Home() {
                 <option value="Tecnologia">Tecnologia</option>
                 <option value="E-commerce">E-commerce</option>
                 <option value="Varejo">Varejo</option>
+                <option value="Finanças">Finanças</option>
+                <option value="Educação">Educação</option>
+                <option value="Saúde">Saúde</option>
+                <option value="Indústria">Indústria</option>
+                <option value="Construção">Construção</option>
+                <option value="Imobiliário">Imobiliário</option>
+                <option value="Marketing e Publicidade">
+                  Marketing e Publicidade
+                </option>
+                <option value="Recursos Humanos">Recursos Humanos</option>
+                <option value="Consultoria">Consultoria</option>
+                <option value="Transporte e Logística">
+                  Transporte e Logística
+                </option>
+                <option value="Turismo e Hotelaria">Turismo e Hotelaria</option>
+                <option value="Alimentação">Alimentação</option>
+                <option value="Agronegócio">Agronegócio</option>
+                <option value="Serviços Profissionais">
+                  Serviços Profissionais
+                </option>
                 <option value="Outro">Outro</option>
               </select>
             </div>

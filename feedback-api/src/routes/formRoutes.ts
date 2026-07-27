@@ -4,10 +4,10 @@ import { authMiddleware } from "../middlewares/authMiddleware";
 
 const router = Router();
 
-// Rota pública
+// rota pública
 router.get("/public/:formId", formController.publicShow);
 
-// A partir daqui todas as rotas exigem autenticação
+// a partir daqui, todas as rotas exigem autenticação
 router.use(authMiddleware);
 
 router.post("/", formController.create);

@@ -5,17 +5,12 @@ import { authMiddleware } from "../middlewares/authMiddleware";
 
 const router = Router();
 
-/**
- * Rotas de autenticação/cadastro de empresa.
- * Públicas — não passam por authMiddleware.
- */
+// rotas públicas
 router.post("/register", registerLimiter, companyController.register);
 router.post("/login", loginLimiter, companyController.login);
 router.get("/public/:slug", companyController.publicShow);
-/**
- * GET /companies/stats
- * Retorna estatísticas agregadas da empresa autenticada. Rota privada.
- */
+
+// rota privada
 router.get("/stats", authMiddleware, companyController.stats);
 
 export default router;

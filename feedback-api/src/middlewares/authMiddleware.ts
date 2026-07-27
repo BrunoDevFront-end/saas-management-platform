@@ -1,8 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
-// Extende o tipo Request do Express para incluir o campo "company",
-// que é injetado por este middleware e consumido pelos controllers.
+// injeta req.company nas rotas privadas, consumido pelos controllers
 declare global {
   namespace Express {
     interface Request {
@@ -14,15 +13,6 @@ declare global {
   }
 }
 
-/**
- * Middleware de autenticação. Valida o JWT enviado no header
- * `Authorization: Bearer <token>` e injeta `req.company` com o id e
- * e-mail da empresa autenticada.
- *
- * Aplicado em todas as rotas privadas (forms e listagem de feedbacks).
- * Em caso de token ausente, malformado, expirado ou inválido, responde 401
- * e a requisição não chega ao controller.
- */
 export function authMiddleware(
   req: Request,
   res: Response,
