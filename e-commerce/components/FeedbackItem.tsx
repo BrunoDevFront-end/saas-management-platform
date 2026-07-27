@@ -1,12 +1,14 @@
 "use client";
+
 import { useState } from "react";
-import { deleteFeedback, Feedback } from "./request";
-import { HiOutlineTrash } from "react-icons/hi";
 import { Star } from "lucide-react";
+import { HiOutlineTrash } from "react-icons/hi";
+
+import { deleteFeedback, Feedback } from "./request";
 
 interface FeedbackItemProps {
   feedback: Feedback;
-  onDeleted?: (id: string) => void; // avisa o pai que foi deletado
+  onDeleted?: (id: string) => void;
 }
 
 export default function FeedbackItem({
@@ -27,40 +29,42 @@ export default function FeedbackItem({
 
   async function handleDelete() {
     setIsDeleting(true);
+
     try {
       await deleteFeedback(feedback.id);
-      onDeleted?.(feedback.id); // avisa o componente pai pra remover da lista
-    } catch (error) {
-      console.error("Erro ao deletar feedback:", error);
+      onDeleted?.(feedback.id);
     } finally {
       setIsDeleting(false);
     }
   }
 
   return (
-    <li className="relative break-words p-4 mb-2 border-l-4 border-[var(--greenSpan)] text-lg text-[var(--textInput)] bg-[var(--borders)] rounded">
-      <div className="flex mb-4">
-        {Array.from({ length: feedback.rating }).map((_, i) => (
+    <li className="relative mb-2 break-words rounded border-l-4 border-[var(--greenSpan)] bg-[var(--borders)] p-4 text-lg text-[var(--textInput)]">
+      {" "}
+      <div className="mb-4 flex">
+        {Array.from({ length: feedback.rating }).map((_, index) => (
           <Star
-            key={i}
+            key={index}
             size={15}
             strokeWidth={1.5}
-            className="text-yellow-300 fill-current"
+            className="fill-current text-yellow-300"
           />
-        ))}
+        ))}{" "}
       </div>
       {feedback.content}
-      <div className="flex justify-between text-sm text-[var(--textSecondary)] pt-4">
+      <div className="flex justify-between pt-4 text-sm text-[var(--textSecondary)]">
         <span>Anônimo</span>
-        <time className="text-sm font-syne-mono text-[var(--textSecondary)]">
+
+        <time className="font-syne-mono text-sm text-[var(--textSecondary)]">
           {formatDate(feedback.createdAt)}
         </time>
       </div>
-
       <button
+        type="button"
         onClick={handleDelete}
-        className="cursor-pointer absolute right-2 top-2 text-[var(--greenSpan)]"
         disabled={isDeleting}
+        aria-label="Excluir feedback"
+        className="absolute right-2 top-2 cursor-pointer text-[var(--greenSpan)] disabled:cursor-not-allowed disabled:opacity-50"
       >
         <HiOutlineTrash size={15} />
       </button>

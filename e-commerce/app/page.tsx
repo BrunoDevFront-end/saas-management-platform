@@ -1,9 +1,24 @@
-import AnyMascot from "@/components/any";
+"use client";
+
 import Image from "next/image";
+import Link from "next/link";
+import { useState } from "react";
+
+import AnyMascot from "@/components/any";
+import WelcomeModal from "@/components/WelcomeModal";
 
 export default function Home() {
+  const [welcomeModal, setWelcomeModal] = useState(true);
+
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
+      {welcomeModal && (
+        <WelcomeModal
+          welcomeModal={welcomeModal}
+          onClose={() => setWelcomeModal(false)}
+        />
+      )}
+
       <nav className="sticky top-0 z-40 border-b border-[var(--borders)] bg-[var(--background)]/90 backdrop-blur-sm">
         <div className="mx-auto flex h-[76px] max-w-[1180px] items-center justify-between px-6 lg:px-10">
           <div className="text-[22px] font-extrabold tracking-tight">
@@ -11,6 +26,13 @@ export default function Home() {
           </div>
 
           <div className="flex items-center gap-9">
+            <Link
+              href="/login"
+              className="hidden text-sm text-[var(--textSecondary)] transition-colors hover:text-[var(--textTitles)] sm:flex"
+            >
+              Entrar
+            </Link>
+
             <a
               href="#how"
               className="hidden text-sm text-[var(--textSecondary)] transition-colors hover:text-[var(--textTitles)] sm:flex"
@@ -36,54 +58,61 @@ export default function Home() {
       </nav>
 
       <main>
-        <header className="pt-10  border-b border-[var(--borders)] px-6 py-[100px] lg:px-10   lg:py-[90px] ">
-          <div className="flex mb-[22px] flex items-center gap-2.5 text-xs uppercase tracking-[0.14em] text-[var(--greenSpan)] before:h-px before:w-6 before:bg-[var(--greenSpan)] before:content-[''] sm:hidden">
+        <header className="border-b border-[var(--borders)] px-6 py-[100px] lg:px-10 lg:py-[90px]">
+          <div className="mb-[22px] flex items-center gap-2.5 text-xs uppercase tracking-[0.14em] text-[var(--greenSpan)] before:h-px before:w-6 before:bg-[var(--greenSpan)] before:content-[''] sm:hidden">
             Feedback 100% anônimo
           </div>
-          <AnyMascot className="fixed ml-auto top-3 -translate-y-10  h-17 md:hidden " />
-          <div className="mx-auto flex  justify-between  max-w-[1180px]">
+
+          <AnyMascot className="fixed top-3 ml-auto h-17 -translate-y-10 md:hidden" />
+
+          <div className="mx-auto flex max-w-[1180px] justify-between">
             <div>
-              <div className="hidden mb-[22px] flex items-center  gap-2.5 text-xs uppercase tracking-[0.14em] text-[var(--greenSpan)] before:h-px before:w-6 before:bg-[var(--greenSpan)] before:content-[''] sm:flex">
+              <div className="mb-[22px] hidden items-center gap-2.5 text-xs uppercase tracking-[0.14em] text-[var(--greenSpan)] before:h-px before:w-6 before:bg-[var(--greenSpan)] before:content-[''] sm:flex">
                 Feedback 100% anônimo
               </div>
 
-              <h1 className="text-center max-w-[850px]  text-[24px] font-extrabold leading-[1] tracking-tighter text-[var(--textTitles)] sm:text-[28px] md:text-[38px] sm:text-start lg:text-[55px] xl:text-[64px] ">
+              <h1 className="max-w-[850px] text-center text-[24px] font-extrabold leading-[1] tracking-tighter text-[var(--textTitles)] sm:text-start sm:text-[28px] md:text-[38px] lg:text-[55px] xl:text-[64px]">
                 O que sua equipe pensa. Sem filtro, sem medo.
               </h1>
 
-              <p className="text-center my-[26px] max-w-[520px] text-lg text-[var(--textSecondary)] sm:text-start">
+              <p className="my-[26px] max-w-[520px] text-center text-lg text-[var(--textSecondary)] sm:text-start">
                 Crie formulários de feedback anônimos, compartilhe com sua
                 equipe e receba opiniões sinceras em um único lugar.
               </p>
 
-              <div className="flex justify-center sm:justify-self-start flex-wrap gap-4">
+              <div className="flex flex-wrap justify-center gap-4 sm:justify-self-start">
                 <a
                   href="/register"
-                  className=" bg-[var(--greenSpan)] px-6 py-3 text-sm font-bold text-[var(--background)] transition-opacity hover:opacity-90 active:scale-[0.97] "
+                  className="bg-[var(--greenSpan)] px-6 py-3 text-sm font-bold text-[var(--background)] transition-opacity hover:opacity-90 active:scale-[0.97]"
                 >
                   Criar formulário grátis
                 </a>
 
                 <a
                   href="#how"
-                  className="hidden border border-[var(--borders)] px-6 py-3 text-sm font-bold text-[var(--textTitles)] transition-colors hover:border-[var(--greenSpan)] active:scale-[0.97] sm:flex "
+                  className="hidden border border-[var(--borders)] px-6 py-3 text-sm font-bold text-[var(--textTitles)] transition-colors hover:border-[var(--greenSpan)] active:scale-[0.97] sm:flex"
                 >
                   Ver como funciona
                 </a>
               </div>
 
-              <div className="text-center mt-7 text-xs text-[var(--textSecondary)] sm:text-start">
+              <div className="mt-7 text-center text-xs text-[var(--textSecondary)] sm:text-start">
                 Crie sua conta gratuitamente e comece a receber feedbacks.
               </div>
             </div>
-            <div className="relative self-end pt-28 w-70 hidden  md:flex lg:pt-35">
-              <AnyMascot className="hidden  md:flex h-45 lg:h-65" />
-              <p className="absolute top-6 left-7  z-10 text-sm font-[family-name:var(--font-space-grotesk)] text-[var(--greenSpan)] max-w-36 min-[1070px]:max-w-56 xl:text-base min-[878px]:top-8">
-                <span className="text-[var(--textTitles)] hidden  min-[1070]:flex ">
+
+            <div className="relative hidden w-70 self-end pt-28 md:flex lg:pt-35">
+              {!welcomeModal && (
+                <AnyMascot className="hidden h-45 md:flex lg:h-65" />
+              )}
+
+              <p className="absolute left-7 top-6 z-10 max-w-36 text-sm font-[family-name:var(--font-space-grotesk)] text-[var(--greenSpan)] min-[878px]:top-8 min-[1070px]:max-w-56 xl:text-base">
+                <span className="hidden text-[var(--textTitles)] min-[1070px]:flex">
                   Toda empresa pode evoluir.
                 </span>{" "}
                 Clique em criar formulário!💚
               </p>
+
               <Image
                 src="/image/AnySpeechBubble.svg"
                 alt=""

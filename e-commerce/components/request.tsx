@@ -23,7 +23,6 @@ export interface Form {
   isActive: boolean;
   activeRating: boolean;
   createdAt: string;
-
   _count: {
     feedbacks: number;
   };
@@ -48,6 +47,7 @@ export interface CompanyStats {
   totalFeedbacks: number;
   feedbacksLast7Days: number;
 }
+
 export interface Company {
   id: string;
   name: string;
@@ -71,33 +71,11 @@ function getToken() {
   return localStorage.getItem("token");
 }
 
-export async function GetPublicForm(formId: string): Promise<PublicForm> {
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/forms/public/${formId}`,
-      {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-      },
-    );
-
-    const result = await response.json();
-
-    if (!response.ok) {
-      throw new Error(result.error || "Erro ao buscar formulário");
-    }
-
-    return result;
-  } catch (error) {
-    handleNetworkError(error);
-    throw error;
-  }
-}
-
 export function getStoredCompany(): Company | null {
-  if (typeof window === "undefined") return null; // guarda pra SSR/build
+  if (typeof window === "undefined") return null;
 
   const raw = localStorage.getItem("company");
+
   if (!raw) return null;
 
   try {
@@ -107,18 +85,22 @@ export function getStoredCompany(): Company | null {
   }
 }
 
-export async function getForms(): Promise<Form[]> {
+export async function GetPublicForm(formId: string): Promise<PublicForm> {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/forms`, {
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/forms/public/${formId}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
       },
-    });
+    );
 
     const result = await response.json();
 
     if (!response.ok) {
-      throw new Error(result.error);
+      throw new Error(result.error || "Erro ao buscar formulário");
     }
 
     return result;
@@ -143,6 +125,26 @@ export async function GetPublicCompanyForms(slug: string) {
 
     if (!response.ok) {
       throw new Error(result.error || "Erro ao buscar formulários da empresa");
+    }
+
+    return result;
+  } catch (error) {
+    handleNetworkError(error);
+  }
+}
+
+export async function getForms(): Promise<Form[]> {
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/forms`, {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error);
     }
 
     return result;
@@ -184,7 +186,83 @@ export async function CreateFeedback({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ content, formId, rating }),
+        body: JSON.stringify({
+          content,
+          formId,
+          rating,
+        }),
+      },
+    );
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || "Erro ao cadastrar feedback");
+    }
+
+    return result;
+  } catch (error) {
+    handleNetworkError(error);
+  }
+}
+
+export async function deleteFeedback(feedbackId: string) {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/feedbacks/${feedbackId}`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      },
+    );
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error);
+    }
+
+    return result;
+  } catch (error) {
+    handleNetworkError(error);
+  }
+}
+
+export async function getCompanyStats(): Promise<CompanyStats> {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/companies/stats`,
+      {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      },
+    );
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error);
+    }
+
+    return result;
+  } catch (error) {
+    handleNetworkError(error);
+  }
+}
+
+export async function registerCompany(data: RegisterCompanies) {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/companies/register`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
       },
     );
 
@@ -200,10 +278,58 @@ export async function CreateFeedback({
   }
 }
 
-export async function deleteFeedback(feedbackId: string) {
+export async function LoginCompany(data: LoginCompany) {
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/feedbacks/${feedbackId}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/companies/login`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      },
+    );
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || "Erro ao realizar login");
+    }
+
+    return result;
+  } catch (error) {
+    handleNetworkError(error);
+  }
+}
+
+export async function CreateNewForm(data: CreateForm) {
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/forms`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getToken()}`,
+      },
+      body: JSON.stringify(data),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || "Erro ao criar formulário");
+    }
+
+    return result;
+  } catch (error) {
+    handleNetworkError(error);
+  }
+}
+
+export async function deleteForm(deleteId: string) {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/forms/${deleteId}`,
       {
         method: "DELETE",
         headers: {
@@ -248,34 +374,6 @@ export async function toggleForm(formId: string) {
   }
 }
 
-export async function getCompanyStats(): Promise<CompanyStats> {
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/companies/stats`,
-      {
-        headers: {
-          Authorization: `Bearer ${getToken()}`,
-        },
-      },
-    );
-
-    const result = await response.json();
-
-    if (!response.ok) {
-      throw new Error(result.error);
-    }
-
-    return result;
-  } catch (error) {
-    handleNetworkError(error);
-  }
-}
-
-/**
- * Trata falhas de comunicação com a API.
- * Utilizado quando o servidor está indisponível,
- * ocorre timeout ou há problemas de rede.
- */
 function handleNetworkError(error: unknown): never {
   if (error instanceof TypeError) {
     throw new Error(
@@ -284,111 +382,4 @@ function handleNetworkError(error: unknown): never {
   }
 
   throw error;
-}
-
-/**
- * Realiza o cadastro de uma nova empresa.
- */
-export async function registerCompany(data: RegisterCompanies) {
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/companies/register`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      },
-    );
-
-    const result = await response.json();
-
-    if (!response.ok) {
-      throw new Error(result.error || "Erro ao cadastrar empresa");
-    }
-
-    return result;
-  } catch (error) {
-    handleNetworkError(error);
-  }
-}
-
-/**
- * Realiza a autenticação da empresa.
- */
-export async function LoginCompany(data: LoginCompany) {
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/companies/login`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      },
-    );
-
-    const result = await response.json();
-
-    if (!response.ok) {
-      throw new Error(result.error || "Erro ao realizar login");
-    }
-
-    return result;
-  } catch (error) {
-    handleNetworkError(error);
-  }
-}
-
-// Cria um novo formulário
-
-export async function CreateNewForm(data: CreateForm) {
-  try {
-    console.log(data);
-    const token = localStorage.getItem("token");
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/forms`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(data),
-    });
-
-    const result = await response.json();
-
-    if (!response.ok) {
-      throw new Error(result.error || "Erro ao realizar login");
-    }
-
-    return result;
-  } catch (error) {
-    handleNetworkError(error);
-  }
-}
-
-export async function deleteForm(deleteId: string) {
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/forms/${deleteId}`,
-      {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${getToken()}`,
-        },
-      },
-    );
-
-    const result = await response.json();
-
-    if (!response.ok) {
-      throw new Error(result.error);
-    }
-
-    return result;
-  } catch (error) {
-    handleNetworkError(error);
-  }
 }
