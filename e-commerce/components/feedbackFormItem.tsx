@@ -5,7 +5,7 @@ interface FeedbackItemProps {
   form: Form;
   onToggle: (id: string) => void;
   setSelectedForm: React.Dispatch<React.SetStateAction<Form | null>>;
-  onFeedbackDeleted: (formId: string) => void;
+
   onDeleteForm: (deleteId: string) => void;
 }
 
@@ -13,34 +13,33 @@ export default function FeedbackFormItem({
   form,
   onToggle,
   setSelectedForm,
-  onFeedbackDeleted,
   onDeleteForm,
 }: FeedbackItemProps) {
   return (
     <li>
-      <article className="flex flex-col relative font-inter bg-[var(--backgroundSecondary)] p-6 mb-1 border-1 border-[var(--GrayEdges)] xl:grid xl:grid-cols-5 xl:grid-cols-[40%_15%_15%_15%_15%] xl:items-center">
+      {" "}
+      <article className="relative mb-1 flex flex-col border border-[var(--GrayEdges)] bg-[var(--backgroundSecondary)] p-6 font-inter xl:grid xl:grid-cols-[40%_15%_15%_15%_15%] xl:items-center">
+        {" "}
         <div>
-          <h3 className="font-bold text-[var(--textTitles)] text-lg mb-1">
-            {form.title}
+          {" "}
+          <h3 className="mb-1 text-lg font-bold text-[var(--textTitles)]">
+            {form.title}{" "}
           </h3>
-
-          <p className="text-xs text-[var(--textPlaceholder)] mb-2">
+          <p className="mb-2 text-xs text-[var(--textPlaceholder)]">
             {form.description}
           </p>
         </div>
-
         <div>
           <strong className="text-sm text-[var(--textTitles)]">
             {form._count?.feedbacks ?? 0}
           </strong>
 
-          <p className="text-xs text-[var(--textPlaceholder)] mb-3">
+          <p className="mb-3 text-xs text-[var(--textPlaceholder)]">
             feedbacks
           </p>
         </div>
-
         <span
-          className={`text-sm w-16 h-6 border grid place-items-center mb-3 xl:m-0 ${
+          className={`mb-3 grid h-6 w-16 place-items-center border text-sm xl:m-0 ${
             form.isActive
               ? "border-[#7CAC45] text-[#7CAC45]"
               : "border-gray-500 text-gray-500"
@@ -48,8 +47,7 @@ export default function FeedbackFormItem({
         >
           {form.isActive ? "ATIVO" : "INATIVO"}
         </span>
-
-        <label className="cursor-pointer w-[5%]">
+        <label className="w-[5%] cursor-pointer">
           <input
             type="checkbox"
             className="sr-only"
@@ -57,25 +55,26 @@ export default function FeedbackFormItem({
             onChange={() => onToggle(form.id)}
           />
 
-          <div className="w-12 h-6 border border-[var(--greenSpan)] relative">
+          <div className="relative h-6 w-12 border border-[var(--greenSpan)]">
             <div
-              className={`w-5 h-5 bg-[var(--greenSpan)] absolute top-0.5 transition-all ${
+              className={`absolute top-0.5 h-5 w-5 bg-[var(--greenSpan)] transition-all ${
                 form.isActive ? "right-0.5" : "left-0.5"
               }`}
             />
           </div>
         </label>
-
         <button
+          type="button"
           onClick={() => setSelectedForm(form)}
-          className="text-[var(--textInput)] self-end w-30 text-sm cursor-pointer xl:self-auto"
+          className="w-30 cursor-pointer self-end text-sm text-[var(--textInput)] xl:self-auto"
         >
           ver respostas →
         </button>
-
         <button
+          type="button"
           onClick={() => onDeleteForm(form.id)}
-          className="absolute right-3 top-3 text-[var(--greenSpan)] cursor-pointer"
+          className="absolute right-3 top-3 cursor-pointer text-[var(--greenSpan)]"
+          aria-label={`Excluir formulário ${form.title}`}
         >
           <HiOutlineTrash size={17} />
         </button>

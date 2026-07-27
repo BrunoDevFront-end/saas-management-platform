@@ -7,17 +7,9 @@ import { House } from "lucide-react";
 import Link from "next/link";
 import { LoginCompany } from "@/components/request";
 import { useRouter } from "next/navigation";
+import AnyMascot from "@/components/any";
+import Image from "next/image";
 
-/**
- * Tela de autenticação da empresa.
- *
- * Permite que empresas cadastradas acessem a plataforma utilizando
- * e-mail e senha. As validações básicas são realizadas no cliente
- * antes do envio para a API, reduzindo requisições inválidas.
- *
- * Fluxo: valida campos -> autentica na API -> armazena credenciais
- * localmente -> redireciona para o dashboard.
- */
 export default function Home() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -26,41 +18,27 @@ export default function Home() {
 
   const router = useRouter();
 
-  /**
-   * Executa o processo de login da empresa.
-   *
-   * Valida os dados informados, envia as credenciais para a API
-   * de autenticação e, em caso de sucesso, armazena o token JWT
-   * e os dados da empresa no navegador.
-   *
-   * Após a autenticação, o usuário é redirecionado para o dashboard.
-   */
   const handleSubmit = async () => {
     setErrorMessage("");
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
     const emailFormatado = email.trim().toLowerCase();
 
-    // Validação do formato do e-mail
     if (!emailRegex.test(emailFormatado)) {
       setErrorMessage("Digite um e-mail válido");
       return;
     }
 
-    // Verifica se o e-mail foi informado
     if (!email.trim()) {
       setErrorMessage("E-mail é obrigatório");
       return;
     }
 
-    // Verifica se a senha foi informada
     if (!password.trim()) {
       setErrorMessage("Senha é obrigatória");
       return;
     }
 
-    // Exige uma senha com no mínimo 8 caracteres
     if (password.length < 8) {
       setErrorMessage("A senha precisa ter no míninimo 8 caracteres");
       return;
@@ -74,14 +52,10 @@ export default function Home() {
         password,
       });
 
-      console.log("Login realizado com sucesso!");
-      console.log(result);
-
-      // Persiste os dados de autenticação para uso na aplicação
       localStorage.setItem("token", result.token);
       localStorage.setItem("company", JSON.stringify(result.company));
 
-      // Mantém o loading até a navegação para o dashboard
+      // delay proposital pra evitar flash de UI entre o login e a navegação
       setTimeout(() => {
         router.push("/dashboard");
       }, 1500);
@@ -97,44 +71,44 @@ export default function Home() {
   };
 
   return (
-    <main className="flex flex-col justify-center md:flex-row w-full min-h-screen bg-[#0a0a0a] text-white font-syne">
-      <aside className="bg-[#111111] p-4 md:p-10 w-full md:w-[70%] xs:p-8">
+    <main className="flex flex-col w-full min-h-screen bg-[#0a0a0a] font-syne text-white md:flex-row">
+      <aside className="w-full bg-[#111111] p-4 xs:p-8 md:w-[70%] md:p-10">
         <Link href="/" className="md:hidden">
           <House size={24} className="absolute top-8 right-8 cursor-pointer" />
         </Link>
 
-        <div className="flex flex-col aside-container justify-center h-[90%]">
-          <p className="text-[#555555] text-base lg:text-xl mt-5 mb-20">
+        <div className="aside-container flex flex-col justify-center h-[90%]">
+          <p className="mt-5 mb-20 text-base text-[#555555] lg:text-xl">
             ◆ FeedBack Platform
           </p>
 
           <TextAnimate />
 
-          <p className="mt-10 mb-40 text-center text-[#A0A0A0] text-sm lg:text-xl lg:text-start">
+          <p className="mt-10 mb-40 text-center text-sm text-[#A0A0A0] lg:text-xl lg:text-start">
             Feedbacks anônimos e honestos. Transforme cultura com dados reais.
           </p>
 
           <div className="flex justify-between">
             <div className="flex flex-col">
-              <strong className="text-[#c8f55a] text-4xl lg:text-5xl animate-pulse">
+              <strong className="text-4xl text-[#c8f55a] animate-pulse lg:text-5xl">
                 100%
               </strong>
-              <span className="text-[#555555] text-base lg:text-xl">
+              <span className="text-base text-[#555555] lg:text-xl">
                 anônimo
               </span>
             </div>
 
             <div className="flex flex-col">
-              <strong className="text-[#c8f55a] text-4xl lg:text-5xl animate-pulse">
+              <strong className="text-4xl text-[#c8f55a] animate-pulse lg:text-5xl">
                 real
               </strong>
-              <span className="text-[#555555] text-base lg:text-xl">time</span>
+              <span className="text-base text-[#555555] lg:text-xl">time</span>
             </div>
           </div>
         </div>
       </aside>
 
-      <div className="w-full flex justify-center items-center bg-[#0a0a0a] relative">
+      <div className="relative flex w-full items-center justify-center bg-[#0a0a0a]">
         <Link href="/" className="hidden md:flex">
           <House size={24} className="absolute top-8 right-8 cursor-pointer" />
         </Link>
@@ -144,9 +118,9 @@ export default function Home() {
             e.preventDefault();
             handleSubmit();
           }}
-          className="flex flex-col gap-4 w-full max-w-[600px] p-4"
+          className="flex w-full max-w-[600px] flex-col gap-4 p-4"
         >
-          <h2 className="text-xl mt-10 font-bold text-center mb-6 sm:text-2xl md:mt-0">
+          <h2 className="mt-10 mb-6 text-xl font-bold text-center sm:text-2xl md:mt-0">
             Entrar na Plataforma
           </h2>
 
@@ -154,30 +128,28 @@ export default function Home() {
             Acesse seu dashboard e acompanhe os feedbacks da sua equipe.
           </h3>
 
-          <div className="flex flex-col md:flex-row gap-3"></div>
-
           <div className="flex flex-col">
-            <label className="text-[#555555] text-sm font-mono">EMAIL</label>
+            <label className="text-sm font-mono text-[#555555]">EMAIL</label>
 
             <input
               type="text"
               placeholder="digite o email..."
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 rounded-md bg-[#1e1e1e] border border-[#4b4b4b] text-[#f0ede6ce] placeholder:text-[#504e4e] text-sm focus:outline-none"
+              className="w-full rounded-md border border-[#4b4b4b] bg-[#1e1e1e] px-3 py-2 text-sm text-[#f0ede6ce] placeholder:text-[#504e4e] focus:outline-none"
             />
           </div>
 
           <div className="flex flex-col md:flex-row gap-3">
-            <div className="flex flex-col w-full">
-              <label className="text-[#555555] text-sm font-mono">SENHA</label>
+            <div className="flex w-full flex-col">
+              <label className="text-sm font-mono text-[#555555]">SENHA</label>
 
               <input
                 type="password"
                 placeholder="digite sua senha..."
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-3 py-2 rounded-md bg-[#1e1e1e] border border-[#4b4b4b] text-[#f0ede6ce] placeholder:text-[#504e4e] text-sm focus:outline-none"
+                className="w-full rounded-md border border-[#4b4b4b] bg-[#1e1e1e] px-3 py-2 text-sm text-[#f0ede6ce] placeholder:text-[#504e4e] focus:outline-none"
               />
             </div>
           </div>
@@ -187,18 +159,31 @@ export default function Home() {
           <button
             disabled={loading}
             type="submit"
-            className="mt-6 mb-2 px-4 py-2 cursor-pointer rounded-md bg-[#c7f464] text-black font-semibold hover:opacity-90 transition"
+            className="mt-6 mb-2 cursor-pointer rounded-md bg-[#c7f464] px-4 py-2 font-semibold text-black transition hover:opacity-90"
           >
             {loading ? "Entrando..." : "Entrar →"}
           </button>
 
-          <p className="text-center text-sm mb-10">
+          <p className="mb-10 text-center text-sm">
             Não possui conta?{" "}
             <Link href="/register" className="text-[#c8f55a] cursor-pointer">
               Criar conta
             </Link>
           </p>
         </form>
+      </div>
+      <AnyMascot className="!fixed bottom-6 right-6 z-50 !w-14 sm:!w-16 lg:!w-16" />
+      <div className="animate-[fadeInOut_8s_ease-in-out_forwards]">
+        <Image
+          src="/image/speechbubble.png"
+          alt=""
+          width={200}
+          height={50}
+          className="!fixed bottom-6 right-16 z-50 h-24 w-64"
+        />
+        <p className="!fixed bottom-1 right-24 z-50 h-24 w-64 max-w-52 text-sm text-[var(--textInput)]">
+          Faça o login para entrar em seu dashboard!💚
+        </p>
       </div>
     </main>
   );

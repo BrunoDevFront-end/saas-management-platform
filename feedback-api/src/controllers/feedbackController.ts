@@ -14,7 +14,7 @@ export const feedbackController = {
   async create(req: Request, res: Response) {
     try {
       const slug = String(req.params.slug);
-      const { content, formId } = req.body;
+      const { content, formId, rating } = req.body;
 
       if (!content) {
         return res
@@ -44,11 +44,13 @@ export const feedbackController = {
           .status(404)
           .json({ error: "Formulário não encontrado ou inativo" });
       }
-
+      console.log("Rating recebido:", rating);
+      console.log(typeof rating);
       const feedback = await prisma.feedback.create({
         data: {
           content,
           formId: form.id,
+          rating,
         },
       });
 
