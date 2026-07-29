@@ -166,7 +166,7 @@ export default function Page() {
           <CompanyPublicLink slug={company.slug} />
         </div>
       )}
-      <main className="flex flex-col items-center mx-4 xl:mx-15">
+      <main className="flex flex-col items-center mx-2 sm:mx-4 xl:mx-15">
         <section className="flex flex-col w-full my-8 md:flex-row md:justify-between md:gap-7">
           <div>
             <h2 className="text-2xl font-bold font-inter text-[var(--textTitles)] xl:text-3xl">
