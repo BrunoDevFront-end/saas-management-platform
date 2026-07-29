@@ -268,22 +268,16 @@ export default function Page() {
         )}
       </main>
       <AnyMascot className="!fixed bottom-6 right-6 z-50 !w-14 sm:!w-16 lg:!w-16" />
-      <div className="animate-[fadeInOut_17s_ease-in-out_forwards]">
+      <div className=" animate-[fadeInOut_17s_ease-in-out_forwards]">
         <Image
           src="/image/speechbubble.png"
           alt=""
           width={200}
           height={50}
-          className="hidden sm:!flex sm:!fixed bottom-4 right-16 z-50 w-[430px] h-[390px]"
+          priority
+          className=" hidden sm:flex sm:!fixed bottom-4 right-16 z-50 w-[430px] h-[390px]"
         />
-        <Image
-          src="/image/mobileBalão.png"
-          alt=""
-          width={200}
-          height={50}
-          className="!fixed sm:hidden bottom-16 right-0 z-50 w-[430px] h-[410px]"
-        />
-        <p className="!fixed bottom-80 right-8 sm:bottom-64 sm:right-36 z-50 max-w-80 h-24 text-md text-[var(--textInput)] font-inter">
+        <p className="hidden sm:block sm:!fixed bottom-64 right-36 z-50 max-w-80 h-24 text-md text-[var(--textInput)] font-inter">
           <span className="text-[var(--greenSpan)]">
             👋 Olá! Seja bem-vindo!
           </span>
