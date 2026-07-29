@@ -119,13 +119,10 @@ export default function AnyMascot({
         height="100%"
         style={{ overflow: "visible" }}
       >
-        {" "}
         <defs>
-          {" "}
           <linearGradient id={bodyGradId} x1="0" y1="0" x2="1" y2="1">
-            {" "}
-            <stop offset="0%" stopColor="#C7EE73" />{" "}
-            <stop offset="100%" stopColor="#6FA82E" />{" "}
+            <stop offset="0%" stopColor="#C7EE73" />
+            <stop offset="100%" stopColor="#6FA82E" />
           </linearGradient>
           <linearGradient id={visorGradId} x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="#212D3A" />
@@ -265,7 +262,6 @@ function EyePair({
     case "happy-circle":
       return (
         <g transform="translate(-24, -6.5)">
-          {" "}
           <path
             d="M1.50008 11.0635C2.50008 -1.43656 17.0001 -1.93655 18.5001 11.0635"
             stroke={strokeColor}

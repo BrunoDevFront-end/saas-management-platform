@@ -44,7 +44,6 @@ export default function RootLayout({
       lang="pt-BR"
       className={`${syne.variable} ${inter.variable} ${syneMono.variable} ${spaceGrotesk.variable} h-full antialiased`}
     >
-      {" "}
       <body className="min-h-screen w-full font-syne">
         {children}
 
