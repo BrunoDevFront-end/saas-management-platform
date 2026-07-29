@@ -281,9 +281,9 @@ export default function Page() {
           alt=""
           width={200}
           height={50}
-          className="!fixed sm:hidden bottom-4 right-8 z-50 w-[430px] h-[390px]"
+          className="!fixed sm:hidden bottom-16 right-0 z-50 w-[430px] h-[410px]"
         />
-        <p className="!fixed bottom-64 right-20 sm:bottom-64 sm:right-36 z-50 max-w-80 h-24 text-md text-[var(--textInput)] font-inter">
+        <p className="!fixed bottom-80 right-8 sm:bottom-64 sm:right-36 z-50 max-w-80 h-24 text-md text-[var(--textInput)] font-inter">
           <span className="text-[var(--greenSpan)]">
             👋 Olá! Seja bem-vindo!
           </span>
