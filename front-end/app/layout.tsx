@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import { Space_Grotesk } from "next/font/google";
 import { Syne, Syne_Mono } from "next/font/google";
 import { Toaster } from "sonner";
+import { FormsProvider } from "@/components/context/FormsContext";
 
 import "./globals.css";
 
@@ -45,7 +46,7 @@ export default function RootLayout({
       className={`${syne.variable} ${inter.variable} ${syneMono.variable} ${spaceGrotesk.variable} h-full antialiased`}
     >
       <body className="min-h-screen w-full font-syne">
-        {children}
+        <FormsProvider>{children}</FormsProvider>
 
         <Toaster richColors position="top-right" />
       </body>

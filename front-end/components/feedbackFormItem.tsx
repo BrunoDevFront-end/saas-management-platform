@@ -1,19 +1,19 @@
 import { type Form } from "@/components/request";
 import { HiOutlineTrash } from "react-icons/hi";
+import { useForms } from "./context/FormsContext";
 
 interface FeedbackItemProps {
   form: Form;
-  onToggle: (id: string) => void;
+  handleToggle: (id: string) => void;
+  handleFormDeleted: (deleteId: string) => void;
   setSelectedForm: React.Dispatch<React.SetStateAction<Form | null>>;
-
-  onDeleteForm: (deleteId: string) => void;
 }
 
 export default function FeedbackFormItem({
   form,
-  onToggle,
+  handleToggle,
   setSelectedForm,
-  onDeleteForm,
+  handleFormDeleted,
 }: FeedbackItemProps) {
   return (
     <li>
@@ -52,7 +52,7 @@ export default function FeedbackFormItem({
             type="checkbox"
             className="sr-only"
             checked={form.isActive}
-            onChange={() => onToggle(form.id)}
+            onChange={() => handleToggle(form.id)}
           />
 
           <div className="relative h-6 w-12 border border-[var(--greenSpan)]">
@@ -72,7 +72,7 @@ export default function FeedbackFormItem({
         </button>
         <button
           type="button"
-          onClick={() => onDeleteForm(form.id)}
+          onClick={() => handleFormDeleted(form.id)}
           className="absolute right-3 top-3 cursor-pointer text-[var(--greenSpan)]"
           aria-label={`Excluir formulário ${form.title}`}
         >
