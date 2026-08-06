@@ -12,12 +12,19 @@ const app = express();
 
 app.use(express.json());
 
-// dev usa localhost:3000; em produção definir FRONTEND_URL no .env
-const allowedOrigin = process.env.FRONTEND_URL || "http://localhost:3000";
+const allowedOrigins = process.env.FRONTEND_URL?.split(",").map((url) =>
+  url.trim(),
+) || ["http://localhost:3000"];
 
 app.use(
   cors({
-    origin: allowedOrigin,
+    origin(origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     methods: ["GET", "POST", "PATCH", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
   }),
