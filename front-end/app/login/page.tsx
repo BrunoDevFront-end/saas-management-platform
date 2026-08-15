@@ -8,7 +8,7 @@ import Link from "next/link";
 import { LoginCompany } from "@/components/request";
 import { useRouter } from "next/navigation";
 import AnyMascot from "@/components/any";
-import Image from "next/image";
+import DialogMascot from "@/components/DialogMascot";
 
 export default function Home() {
   const [email, setEmail] = useState("");
@@ -172,19 +172,24 @@ export default function Home() {
           </p>
         </form>
       </div>
-      <AnyMascot className="!fixed bottom-6 right-6 z-50 !w-14 sm:!w-16 lg:!w-16" />
-      <div className="animate-[fadeInOut_8s_ease-in-out_forwards]">
-        <Image
-          src="/image/speechbubble.png"
-          alt=""
-          width={200}
-          height={50}
-          className="!fixed bottom-6 right-16 z-50 h-24 w-64"
-        />
-        <p className="!fixed bottom-1 right-24 z-50 h-24 w-64 max-w-52 text-sm text-[var(--textInput)]">
-          Faça o login para entrar em seu dashboard!💚
-        </p>
-      </div>
+
+      <AnyMascot
+        className="
+          !fixed
+          bottom-6
+          right-6
+          z-50
+          !w-14
+          sm:!w-16
+          lg:!w-16
+        "
+      />
+
+      <DialogMascot
+        message={<>Faça o login para entrar em seu dashboard! 💚</>}
+      />
     </main>
   );
 }
+
+<div className="animate-[fadeInOut_8s_ease-in-out_forwards]"></div>;

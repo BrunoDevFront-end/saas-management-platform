@@ -14,8 +14,8 @@ import { CompanyPublicLink } from "@/components/CompanyPublicLink";
 import FeedbackDetailsModal from "@/components/FeedbackDetailsModal";
 import { useRouter } from "next/navigation";
 import AnyMascot from "@/components/any";
-import Image from "next/image";
 import { useForms } from "@/components/context/FormsContext";
+import DialogMascot from "@/components/DialogMascot";
 
 export default function Page() {
   const [openModalForm, setopenModalForm] = useState(false);
@@ -241,33 +241,24 @@ export default function Page() {
       </main>
 
       <AnyMascot className="!fixed bottom-6 right-6 z-50 !w-14 sm:!w-16 lg:!w-16" />
-
-      <div className="animate-[fadeInOut_17s_ease-in-out_forwards]">
-        <Image
-          src="/image/speechbubble.png"
-          alt=""
-          width={200}
-          height={50}
-          priority
-          className="hidden sm:flex sm:!fixed bottom-4 right-16 z-50 w-[430px] h-[390px]"
-        />
-
-        <p className="hidden sm:block sm:!fixed bottom-64 right-36 z-50 max-w-80 h-24 text-md text-[var(--textInput)] font-inter">
-          <span className="text-[var(--greenSpan)]">
-            👋 Olá! Seja bem-vindo!
-          </span>
-          <br />
-          Aqui você acompanha os feedbacks enviados pela sua equipe.
-          <br />
-          <br />
-          🔗 Para seus funcionários acessarem os formulários, compartilhe o link
-          público disponível no topo da página.
-          <br />
-          <br />
-          📝 Os 3 formulários disponíveis são simulados, para você conhecer como
-          os feedbacks aparecerão no dashboard.💚
-        </p>
-      </div>
+      <DialogMascot
+        message={
+          <>
+            <span className="text-[var(--greenSpan)]">
+              👋 Olá! Seja bem-vindo!
+            </span>
+            <br />
+            <br />
+            Aqui você acompanha os feedbacks enviados pela sua equipe.
+            <br />
+            <br />
+            🔗 Para seus funcionários acessarem os formulários, compartilhe o
+            link público disponível no topo da página.
+            <br />
+            <br />
+          </>
+        }
+      />
     </div>
   );
 }
