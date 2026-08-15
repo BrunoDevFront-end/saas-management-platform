@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { House } from "lucide-react";
 import { toast } from "sonner";
-
+import DialogMascot from "@/components/DialogMascot";
 import AnyMascot from "@/components/any";
 import TextAnimate from "@/components/TextAnimate";
 import { registerCompany } from "@/components/request";
@@ -281,21 +281,23 @@ export default function Home() {
         </form>
       </div>
 
-      <AnyMascot className="!fixed bottom-6 right-6 z-50 !w-14 sm:!w-16 lg:!w-16" />
+      <AnyMascot
+        className="
+                !fixed
+                bottom-6
+                right-6
+                z-50
+                !w-14
+                sm:!w-16
+                lg:!w-16
+              "
+      />
 
-      <div className="animate-[fadeInOut_8s_ease-in-out_forwards]">
-        <Image
-          src="/image/speechbubble.png"
-          alt=""
-          width={200}
-          height={50}
-          className="!fixed bottom-6 right-16 z-50 h-24 w-64"
-        />
-
-        <p className="!fixed bottom-2 right-24 z-50 h-24 w-64 max-w-52 text-sm text-[var(--textInput)]">
-          Cadastre sua empresa para ter acesso a todos os recursos!
-        </p>
-      </div>
+      <DialogMascot
+        message={
+          <>Cadastre sua empresa para ter acesso a todos os recursos! 💚</>
+        }
+      />
     </main>
   );
 }
