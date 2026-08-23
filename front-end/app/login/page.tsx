@@ -9,6 +9,7 @@ import { LoginCompany } from "@/components/request";
 import { useRouter } from "next/navigation";
 import AnyMascot from "@/components/any";
 import DialogMascot from "@/components/DialogMascot";
+import { toast } from "sonner";
 
 export default function Home() {
   const [email, setEmail] = useState("");
@@ -57,6 +58,7 @@ export default function Home() {
 
       // delay proposital pra evitar flash de UI entre o login e a navegação
       setTimeout(() => {
+        toast.success("Login efetuado com sucesso!");
         router.push("/dashboard");
       }, 1500);
     } catch (error) {
@@ -191,5 +193,3 @@ export default function Home() {
     </main>
   );
 }
-
-<div className="animate-[fadeInOut_8s_ease-in-out_forwards]"></div>;

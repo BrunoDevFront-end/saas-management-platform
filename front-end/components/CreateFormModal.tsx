@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { FilePlus2 } from "lucide-react";
 import { HiOutlineX } from "react-icons/hi";
-
+import { toast } from "sonner";
 import { StarRatingToggle } from "./StarRatingTogle";
 import { CreateNewForm, Form } from "./request";
 
@@ -50,6 +50,7 @@ export default function CreateFormModal({
       });
 
       onFormCreated(data);
+      toast.success("Formulário criado!");
       setopenModalForm(false);
     } catch (error) {
       if (error instanceof Error) {

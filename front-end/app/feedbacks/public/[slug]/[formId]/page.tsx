@@ -23,6 +23,7 @@ export default function CreatePublicFeedback() {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [rating, setRating] = useState(0);
+  const [isFeedbackSent, setIsFeedbackSent] = useState(false);
 
   useEffect(() => {
     async function fetchForm() {
@@ -64,8 +65,7 @@ export default function CreatePublicFeedback() {
       });
 
       setContent("");
-
-      alert("Feedback enviado com sucesso!");
+      setIsFeedbackSent(true);
     } catch (error) {
       if (error instanceof Error) {
         setErrorMessage(error.message);
@@ -219,6 +219,31 @@ export default function CreatePublicFeedback() {
           </p>
         </form>
       </div>
+
+      <dialog
+        open={isFeedbackSent}
+        className="fixed inset-0 m-auto z-40  w-md   border-1 border-[var(--greenSpan)] bg-black p-0 text-white"
+      >
+        <section className="flex my-10 flex-col items-center justify-center px-6">
+          <h2 className="text-center text-xl font-medium">
+            Seu feedback foi enviado com{" "}
+            <span className="text-lime-600">sucesso!</span>
+          </h2>
+          <p className="mt-3 mb-16 text-center text-[var(--textPlaceholder)]">
+            Clique em ok para voltar aos formulários
+          </p>
+          <button
+            className="font-inter w-full cursor-pointer bg-[var(--greenSpan)] p-2 text-[14px] font-bold text-black transition-all duration-200 hover:scale-[1.02] hover:shadow-[0_0_15px_var(--greenSpan)]"
+            onClick={() => {
+              setIsFeedbackSent(false);
+              router.back();
+            }}
+          >
+            OK
+          </button>
+        </section>
+      </dialog>
+      {isFeedbackSent && <div className="fixed inset-0 z-20 bg-black/70" />}
     </div>
   );
 }

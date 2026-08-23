@@ -48,11 +48,10 @@ export function FormsProvider({ children }: FormsProviderProps) {
       setForms(data);
       setError(null);
     } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("Erro ao buscar formulários.");
-      }
+      const message =
+        err instanceof Error ? err.message : "Erro ao buscar formulários.";
+
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -62,12 +61,6 @@ export function FormsProvider({ children }: FormsProviderProps) {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchForms();
   }, [fetchForms]);
-
-  useEffect(() => {
-    if (error) {
-      toast.error(error);
-    }
-  }, [error]);
 
   function createForm(newForm: Form) {
     setForms((prev) => [newForm, ...prev]);
@@ -99,11 +92,12 @@ export function FormsProvider({ children }: FormsProviderProps) {
         ),
       );
     } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("Não foi possível alterar o status do formulário.");
-      }
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Não foi possível alterar o status do formulário.";
+
+      toast.error(message);
     }
   }
 
@@ -113,11 +107,12 @@ export function FormsProvider({ children }: FormsProviderProps) {
 
       setForms((prev) => prev.filter((form) => form.id !== id));
     } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("Não foi possível deletar esse formulário.");
-      }
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Não foi possível deletar esse formulário.";
+
+      toast.error(message);
     }
   }
 
