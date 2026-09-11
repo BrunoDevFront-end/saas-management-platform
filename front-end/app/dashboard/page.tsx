@@ -55,17 +55,19 @@ export default function Page() {
   }, [router]);
 
   useEffect(() => {
+    if (isAuthenticated !== true) return;
+
     async function loadStats() {
       try {
         const data = await getCompanyStats();
         setStats(data);
       } catch (error) {
-        console.error(error);
+        console.error("Erro ao carregar estatísticas:", error);
       }
     }
 
     loadStats();
-  }, []);
+  }, [isAuthenticated]);
 
   async function handleFormDeleted(deleteId: string) {
     await deleteForm(deleteId);

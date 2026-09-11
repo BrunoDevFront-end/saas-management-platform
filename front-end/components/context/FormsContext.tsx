@@ -16,6 +16,8 @@ import {
   toggleForm as toggleFormApi,
 } from "../request";
 
+import { useAuthenticated } from "./Authenticated";
+
 interface FormsContextType {
   forms: Form[];
   loading: boolean;
@@ -39,6 +41,8 @@ export function FormsProvider({ children }: FormsProviderProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const { isAuthenticated } = useAuthenticated();
+
   const fetchForms = useCallback(async () => {
     setLoading(true);
 
@@ -58,9 +62,10 @@ export function FormsProvider({ children }: FormsProviderProps) {
   }, []);
 
   useEffect(() => {
+    if (isAuthenticated !== true) return;
     // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchForms();
-  }, [fetchForms]);
+  }, [isAuthenticated, fetchForms]);
 
   function createForm(newForm: Form) {
     setForms((prev) => [newForm, ...prev]);
