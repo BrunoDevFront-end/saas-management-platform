@@ -18,6 +18,10 @@ export function AuthenticatedProvider({
   children,
 }: AuthenticatedProviderProps) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(() => {
+    if (typeof window === "undefined") {
+      return null;
+    }
+
     return !!localStorage.getItem("token");
   });
 
