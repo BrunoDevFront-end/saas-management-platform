@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import AnyMascot from "@/components/any";
 import DialogMascot from "@/components/DialogMascot";
 import { toast } from "sonner";
+import { useAuthenticated } from "@/components/context/Authenticated";
 
 export default function Home() {
   const [email, setEmail] = useState("");
@@ -18,6 +19,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
 
   const router = useRouter();
+  const { login } = useAuthenticated();
 
   const handleSubmit = async () => {
     setErrorMessage("");
@@ -55,6 +57,8 @@ export default function Home() {
 
       localStorage.setItem("token", result.token);
       localStorage.setItem("company", JSON.stringify(result.company));
+
+      login();
 
       // delay proposital pra evitar flash de UI entre o login e a navegação
       setTimeout(() => {

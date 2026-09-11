@@ -16,6 +16,7 @@ import { useRouter } from "next/navigation";
 import AnyMascot from "@/components/any";
 import { useForms } from "@/components/context/FormsContext";
 import DialogMascot from "@/components/DialogMascot";
+import { useAuthenticated } from "@/components/context/Authenticated";
 
 export default function Page() {
   const [openModalForm, setopenModalForm] = useState(false);
@@ -24,9 +25,34 @@ export default function Page() {
   const [stats, setStats] = useState<CompanyStats | null>(null);
 
   const router = useRouter();
+  const { isAuthenticated, logout } = useAuthenticated();
 
   const { forms, loading, createForm, deleteForm, deleteFeedback, toggleForm } =
     useForms();
+
+  useEffect(() => {
+    if (isAuthenticated === false) {
+      router.replace("/");
+    }
+  }, [isAuthenticated, router]);
+
+  useEffect(() => {
+    function checkAuthentication() {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        router.replace("/");
+      }
+    }
+
+    checkAuthentication();
+
+    window.addEventListener("pageshow", checkAuthentication);
+
+    return () => {
+      window.removeEventListener("pageshow", checkAuthentication);
+    };
+  }, [router]);
 
   useEffect(() => {
     async function loadStats() {
@@ -77,6 +103,35 @@ export default function Page() {
 
   const activeFormsCount = forms.filter((form) => form.isActive).length;
 
+  if (isAuthenticated === null) {
+    return null;
+  }
+
+  if (isAuthenticated === false) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-[var(--background)] px-4">
+        <div className="w-full max-w-md p-8 border border-[var(--GrayEdges)] bg-[var(--backgroundSecondary)] text-center">
+          <div className="mb-5 text-4xl text-[var(--greenSpan)]">◆</div>
+
+          <h2 className="text-xl font-bold font-inter text-[var(--textTitles)]">
+            Acesso restrito
+          </h2>
+
+          <p className="mt-3 text-sm leading-6 text-[var(--textPlaceholder)]">
+            Você precisa estar logado para acessar o dashboard.
+          </p>
+
+          <button
+            onClick={() => router.replace("/login")}
+            className="w-full mt-6 p-3 bg-[var(--greenSpan)] text-black font-bold font-inter cursor-pointer hover:scale-[1.02] transition-all"
+          >
+            fazer login
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -84,6 +139,11 @@ export default function Page() {
       </div>
     );
   }
+
+  const handleLogout = () => {
+    logout();
+    router.replace("/");
+  };
 
   return (
     <div className="w-full min-h-screen">
@@ -107,7 +167,7 @@ export default function Page() {
           </strong>
 
           <button
-            onClick={() => router.push("/")}
+            onClick={handleLogout}
             className="px-4 py-1 border-1 border-[var(--GrayEdges)] font-syne-mono text-center text-[var(--textSecondary)] cursor-pointer transition-colors hover:text-[var(--greenSpan)] hover:border-b-[var(--greenSpan)]"
           >
             ⟶ sair
