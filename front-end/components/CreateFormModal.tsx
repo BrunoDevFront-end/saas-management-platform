@@ -106,6 +106,7 @@ export default function CreateFormModal({
                 placeholder="Ex: Pesquisa de Clima..."
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
+                maxLength={35}
                 className="border-2 border-[var(--borders)] bg-[var(--GrayEdges)] p-3 text-neutral-400 transition-colors duration-300 focus:border-l-[var(--greenSpan)] focus:outline-none focus:shadow-[0_0_1px_var(--greenSpan)]"
               />
             </div>
@@ -117,6 +118,7 @@ export default function CreateFormModal({
                 id="descricao"
                 placeholder="Descreva o objetivo deste formulário... (opcional)"
                 value={description}
+                maxLength={90}
                 onChange={(e) => setDescription(e.target.value)}
                 className="border-2 border-[var(--borders)] bg-[var(--GrayEdges)] p-4 text-neutral-400 transition-colors duration-300 focus:border-l-[var(--greenSpan)] focus:outline-none focus:shadow-[0_0_1px_var(--greenSpan)]"
               />

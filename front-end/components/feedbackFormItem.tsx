@@ -25,7 +25,7 @@ export default function FeedbackFormItem({
           <h3 className="mb-1 text-lg font-bold text-[var(--textTitles)]">
             {form.title}{" "}
           </h3>
-          <p className="mb-2 text-xs text-[var(--textPlaceholder)]">
+          <p className="mb-2 text-xs max-w-lg text-[var(--textPlaceholder)]">
             {form.description}
           </p>
         </div>
