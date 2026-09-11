@@ -19,7 +19,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
 
   const router = useRouter();
-  const { login } = useAuthenticated();
+  const { login, logout } = useAuthenticated();
 
   const handleSubmit = async () => {
     setErrorMessage("");
@@ -50,6 +50,8 @@ export default function Home() {
     setLoading(true);
 
     try {
+      logout();
+
       const result = await LoginCompany({
         email,
         password,
