@@ -18,6 +18,7 @@ import { useForms } from "@/components/context/FormsContext";
 import DialogMascot from "@/components/DialogMascot";
 import { useAuthenticated } from "@/components/context/Authenticated";
 import StatLoading from "@/components/skeletonLoading";
+import FormsSkeleton from "@/components/FornsSkeleton";
 
 export default function Page() {
   const [openModalForm, setopenModalForm] = useState(false);
@@ -267,19 +268,21 @@ export default function Page() {
             </select>
           </div>
         </section>
-
-        <ul className="w-full">
-          {forms.map((form) => (
-            <FeedbackFormItem
-              key={form.id}
-              form={form}
-              handleFormDeleted={handleFormDeleted}
-              handleToggle={handleToggle}
-              setSelectedForm={setSelectedForm}
-            />
-          ))}
-        </ul>
-
+        {loading ? (
+          <FormsSkeleton />
+        ) : (
+          <ul className="w-full">
+            {forms.map((form) => (
+              <FeedbackFormItem
+                key={form.id}
+                form={form}
+                handleFormDeleted={handleFormDeleted}
+                handleToggle={handleToggle}
+                setSelectedForm={setSelectedForm}
+              />
+            ))}
+          </ul>
+        )}
         {selectedForm && (
           <FeedbackDetailsModal
             form={selectedForm}

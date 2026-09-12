@@ -1,6 +1,12 @@
 "use client";
 
-import { createContext, useContext, useState, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
 
 interface AuthenticatedContextType {
   isAuthenticated: boolean | null;
@@ -17,13 +23,12 @@ const Authenticated = createContext<AuthenticatedContextType | null>(null);
 export function AuthenticatedProvider({
   children,
 }: AuthenticatedProviderProps) {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(() => {
-    if (typeof window === "undefined") {
-      return null;
-    }
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
-    return !!localStorage.getItem("token");
-  });
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsAuthenticated(!!localStorage.getItem("token"));
+  }, []);
 
   function login() {
     setIsAuthenticated(true);
