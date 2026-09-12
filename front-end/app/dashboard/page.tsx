@@ -17,6 +17,7 @@ import AnyMascot from "@/components/any";
 import { useForms } from "@/components/context/FormsContext";
 import DialogMascot from "@/components/DialogMascot";
 import { useAuthenticated } from "@/components/context/Authenticated";
+import StatLoading from "@/components/skeletonLoading";
 
 export default function Page() {
   const [openModalForm, setopenModalForm] = useState(false);
@@ -134,14 +135,6 @@ export default function Page() {
     );
   }
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p>Carregando...</p>
-      </div>
-    );
-  }
-
   const handleLogout = () => {
     logout();
     router.replace("/");
@@ -209,32 +202,40 @@ export default function Page() {
         </section>
 
         <section className="grid grid-cols-2 xl:grid-cols-4 w-full my-4 border-1 border-[var(--GrayEdges)]">
-          <article className="p-4">
-            <strong className="text-[var(--greenSpan)] text-3xl xl:text-4xl">
-              {activeFormsCount}
-            </strong>
+          {loading ? (
+            <StatLoading />
+          ) : (
+            <article className="p-4">
+              <strong className="text-[var(--greenSpan)] text-3xl xl:text-4xl">
+                {activeFormsCount}
+              </strong>
 
-            <h3 className="mt-1 text-[var(--textPlaceholder)] text-xs">
-              FORMULÁRIOS ATIVOS
-            </h3>
-          </article>
+              <h3 className="mt-1 text-[var(--textPlaceholder)] text-xs">
+                FORMULÁRIOS ATIVOS
+              </h3>
+            </article>
+          )}
+          {loading ? (
+            <StatLoading />
+          ) : (
+            <article className="p-5 border-l border-[var(--GrayEdges)]">
+              <strong className="text-3xl text-[var(--textTitles)] xl:text-4xl">
+                {stats?.totalFeedbacks ?? 0}
+              </strong>
 
-          <article className="p-5 border-l border-[var(--GrayEdges)]">
-            <strong className="text-3xl text-[var(--textTitles)] xl:text-4xl">
-              {stats?.totalFeedbacks ?? 0}
-            </strong>
+              <h3 className="mt-1 text-[var(--textPlaceholder)] text-xs">
+                FEEDBACKS
+              </h3>
 
-            <h3 className="mt-1 text-[var(--textPlaceholder)] text-xs">
-              FEEDBACKS
-            </h3>
+              <h3 className="text-[var(--textPlaceholder)] text-xs">
+                RECEBIDOS
+              </h3>
 
-            <h3 className="text-[var(--textPlaceholder)] text-xs">RECEBIDOS</h3>
-
-            <p className="mt-1 text-sm text-[#7CAC45]">
-              +{stats?.feedbacksLast7Days ?? 0} nos últimos 7 dias
-            </p>
-          </article>
-
+              <p className="mt-1 text-sm text-[#7CAC45]">
+                +{stats?.feedbacksLast7Days ?? 0} nos últimos 7 dias
+              </p>
+            </article>
+          )}
           <article className="p-5 xl:border-l border-[var(--GrayEdges)]">
             <strong className="text-3xl text-[var(--textTitles)] xl:text-4xl">
               100%

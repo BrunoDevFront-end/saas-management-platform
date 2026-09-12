@@ -63,7 +63,7 @@ export default function WelcomeModal({
 
             <section className="flex flex-col gap-5">
               <p className="text-[var(--textInput)]">
-                Aqui no Anom, sua empresa coleta feedbacks anônimos e tramsforma
+                Aqui no Anom, sua empresa coleta feedbacks anônimos e transforma
                 opiniões em{" "}
                 <span className="text-[var(--greenSpan)]">insights</span> que
                 realmente fazem a{" "}
