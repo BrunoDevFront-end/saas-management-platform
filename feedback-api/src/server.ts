@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import "./prisma/client";
+import prisma from "./prisma/client";
 import companyRoutes from "./routes/companyRoutes";
 import formRoutes from "./routes/formRoutes";
 import feedbackRoutes from "./routes/feedbackRoutes";
@@ -32,6 +32,33 @@ app.use(
 
 app.get("/health", (req, res) => {
   res.json({ status: "API rodando!" });
+});
+
+app.get("/health/db", async (req, res) => {
+  const cronSecret = process.env.CRON_SECRET;
+
+  if (!cronSecret || req.headers["x-cron-secret"] !== cronSecret) {
+    return res.status(401).json({
+      status: "error",
+      message: "Unauthorized",
+    });
+  }
+
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+
+    return res.status(200).json({
+      status: "ok",
+      database: "connected",
+    });
+  } catch (error) {
+    console.error("Erro ao verificar o banco de dados:", error);
+
+    return res.status(503).json({
+      status: "error",
+      database: "disconnected",
+    });
+  }
 });
 
 app.use("/companies", companyRoutes);
