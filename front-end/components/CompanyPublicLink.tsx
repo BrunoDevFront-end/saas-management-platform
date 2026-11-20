@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Copy } from "lucide-react";
+import { Check, Copy, Link2 } from "lucide-react";
 import { useState } from "react";
 
 export function CompanyPublicLink({ slug }: { slug: string }) {
@@ -23,26 +23,122 @@ export function CompanyPublicLink({ slug }: { slug: string }) {
   }
 
   return (
-    <div className="mx-4 flex items-center gap-3 border border-[#c8f55a] p-3 xl:mx-15">
-      {" "}
-      <span className="flex-1 truncate text-sm text-[#f5f5f0]">{link} </span>
-      <button
-        type="button"
-        onClick={handleCopy}
-        className="flex items-center gap-2 border-2 border-[#c8f55a] px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-[#c8f55a] transition-colors hover:bg-[#c8f55a] hover:text-black"
-      >
-        {copied ? (
-          <>
-            <Check size={14} />
-            copiado!
-          </>
-        ) : (
-          <>
-            <Copy size={14} />
-            copiar link
-          </>
-        )}
-      </button>
+    <div
+      className="
+        flex flex-col gap-4
+        rounded-xl
+        border border-[var(--borders)]
+        bg-[var(--backgroundSecondary)]
+        p-4
+        sm:flex-row sm:items-center
+        
+      "
+    >
+      {/* TÍTULO */}
+
+      <div className="flex items-center gap-2 sm:hidden">
+        <Link2 size={19} className="shrink-0 text-[var(--greenSpan)]" />
+
+        <strong className="text-sm font-semibold text-[var(--textTitles)]">
+          Link público da empresa
+        </strong>
+      </div>
+
+      <div className="hidden items-center gap-2 sm:flex sm:w-full sm:flex-col sm:items-start sm:gap-4">
+        <div className="flex items-center gap-2">
+          <Link2 size={19} className="text-[var(--greenSpan)]" />
+
+          <strong className="text-sm font-semibold text-[var(--textTitles)]">
+            Link público da empresa
+          </strong>
+        </div>
+
+        <div className="flex w-full items-center gap-4">
+          {/* LINK */}
+
+          <div
+            className="
+              min-w-0 flex-1 truncate
+              rounded-xl
+              border border-[var(--borders)]
+              bg-[var(--foreground)]
+              px-3 py-2.5
+              text-xs text-[var(--textSecondary)]
+            "
+            title={link}
+          >
+            {link}
+          </div>
+
+          {/* COPIAR */}
+
+          <button
+            type="button"
+            onClick={handleCopy}
+            className="
+              flex shrink-0 cursor-pointer items-center
+              justify-center gap-2
+              rounded-full
+              bg-[var(--greenSpan2)]
+              px-5 py-2.5
+              text-xs font-bold
+              text-[var(--greenSpan)]
+              shadow-sm
+              transition-all duration-200
+              hover:brightness-95 hover:shadow-md
+              active:scale-95
+            "
+          >
+            {copied ? (
+              <>
+                <Check size={15} />
+                Copiado!
+              </>
+            ) : (
+              <>
+                <Copy size={14} />
+                Copiar link
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+
+      {/* VERSÃO MOBILE */}
+
+      <div className="flex w-full items-center gap-2 sm:hidden">
+        <div
+          className="
+            min-w-0 flex-1 truncate
+            rounded-xl
+            border border-[var(--borders)]
+            bg-[var(--foreground)]
+            px-3 py-2.5
+            text-xs text-[var(--textSecondary)]
+          "
+          title={link}
+        >
+          {link}
+        </div>
+
+        <button
+          type="button"
+          onClick={handleCopy}
+          aria-label="Copiar link público"
+          className="
+            flex h-10 w-10 shrink-0 cursor-pointer
+            items-center justify-center
+            rounded-full
+            bg-[var(--greenSpan2)]
+            text-[var(--greenSpan)]
+            transition-all
+            hover:brightness-95
+            active:scale-95
+          "
+        >
+          {copied ? <Check size={17} /> : <Copy size={16} />}
+        </button>
+      </div>
     </div>
   );
 }

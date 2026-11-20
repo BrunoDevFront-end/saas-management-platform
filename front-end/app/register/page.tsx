@@ -1,14 +1,24 @@
 "use client";
 
-import Image from "next/image";
+import { useState } from "react";
+
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { House } from "lucide-react";
+
+import {
+  House,
+  ShieldCheck,
+  Smile,
+  Eye,
+  EyeOff,
+  ArrowRight,
+} from "lucide-react";
+
 import { toast } from "sonner";
-import DialogMascot from "@/components/DialogMascot";
-import AnyMascot from "@/components/any";
+
 import TextAnimate from "@/components/TextAnimate";
+import AnyMascot from "@/components/any";
+import DialogMascot from "@/components/DialogMascot";
 import { registerCompany } from "@/components/request";
 
 export default function Home() {
@@ -18,15 +28,19 @@ export default function Home() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [segment, setSegment] = useState("");
 
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
   const router = useRouter();
 
+  // CADASTRO
+
   const handleSubmit = async () => {
     setErrorMessage("");
 
-    // Valida os dados antes de enviar a requisição.
     if (!name.trim()) {
       setErrorMessage("Nome é obrigatório!");
       return;
@@ -63,7 +77,6 @@ export default function Home() {
       return;
     }
 
-    // Mantém a mesma regra de complexidade aplicada no backend.
     if (!passwordRegex.test(password)) {
       setErrorMessage(
         "A senha deve conter no mínimo 8 caracteres, uma letra maiúscula, uma minúscula, um número e um caractere especial",
@@ -83,7 +96,7 @@ export default function Home() {
     try {
       await registerCompany({
         name: name.trim(),
-        email: email.trim().toLowerCase(),
+        email: emailFormatado,
         segment,
         password,
       });
@@ -91,7 +104,6 @@ export default function Home() {
       toast.dismiss(toastID);
       toast.success("Empresa cadastrada com sucesso!");
 
-      // Aguarda a exibição da confirmação antes de redirecionar.
       setTimeout(() => {
         router.push("/login");
       }, 1500);
@@ -109,188 +121,359 @@ export default function Home() {
   };
 
   return (
-    <main className="flex min-h-screen w-full flex-col bg-[#0a0a0a] font-syne text-white md:flex-row">
-      <aside className="w-full bg-[#111111] p-4 md:w-[70%] md:p-10 xs:p-8">
-        <Link href="/" className="md:hidden">
-          <House size={24} className="absolute right-8 top-8 cursor-pointer" />
-        </Link>
+    <main className="min-h-dvh bg-[var(--background)] px-3 pt-3 font-syne text-[var(--textTitles)] sm:px-5 sm:pt-4 lg:h-dvh lg:overflow-hidden lg:px-7 lg:pt-5">
+      {/* HEADER */}
 
-        <div className="aside-container flex h-[90%] flex-col justify-center">
-          <p className="mb-20 mt-5 text-base text-[#555555] lg:text-xl">
-            ◆ FeedBack Platform
-          </p>
-
-          <TextAnimate />
-
-          <p className="mb-40 mt-10 text-center text-sm text-[#A0A0A0] lg:text-start lg:text-xl">
-            Feedbacks anônimos e honestos. Transforme cultura com dados reais.
-          </p>
-
-          <div className="flex justify-between">
-            <div className="flex flex-col">
-              <strong className="animate-pulse text-4xl text-[#c8f55a] lg:text-5xl">
-                100%
-              </strong>
-
-              <span className="text-base text-[#555555] lg:text-xl">
-                anônimo
-              </span>
-            </div>
-
-            <div className="flex flex-col">
-              <strong className="animate-pulse text-4xl text-[#c8f55a] lg:text-5xl">
-                real
-              </strong>
-
-              <span className="text-base text-[#555555] lg:text-xl">time</span>
-            </div>
-          </div>
-        </div>
-      </aside>
-
-      <div className="relative flex w-full items-center justify-center bg-[#0a0a0a]">
-        <Link href="/" className="hidden md:flex">
-          <House size={24} className="absolute right-8 top-8 cursor-pointer" />
-        </Link>
-
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSubmit();
-          }}
-          className="flex w-full max-w-[600px] flex-col gap-4 p-4"
+      <header className="mx-auto flex h-[65px] w-full max-w-[1440px] shrink-0 items-center justify-between border-b border-[var(--borders)] px-5 sm:px-8">
+        <Link
+          href="/"
+          className="text-2xl font-extrabold tracking-tight text-[var(--greenSpan)]"
         >
-          <h2 className="mb-6 mt-10 text-center text-xl font-bold sm:text-2xl md:mt-0">
-            Cadastre sua Empresa
-          </h2>
+          anom<span className="text-[var(--greenSpan2)]">.</span>
+        </Link>
 
-          <h3 className="text-sm text-[#555555]">
-            Comece gratuitamente, sem cartão de crédito.
-          </h3>
+        <Link
+          href="/"
+          aria-label="Voltar para a página inicial"
+          className="rounded-full p-2 transition hover:bg-[var(--greenLeve)]"
+        >
+          <House size={21} />
+        </Link>
+      </header>
 
-          <div className="flex flex-col gap-3 md:flex-row">
-            <div className="flex w-full flex-col">
-              <label className="font-mono text-sm text-[#555555]">
-                NOME DA EMPRESA
-              </label>
+      {/* CONTEÚDO PRINCIPAL */}
 
-              <input
-                type="text"
-                placeholder="digite o nome da empresa..."
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full rounded-md border border-[#4b4b4b] bg-[#1e1e1e] px-3 py-2 text-sm text-[#f0ede6ce] placeholder:text-[#504e4e] focus:outline-none"
-              />
+      <section className="mx-auto grid w-full max-w-[1440px] grid-cols-1 lg:h-[calc(100dvh-85px)] lg:grid-cols-[0.95fr_1.05fr] lg:overflow-hidden">
+        {/* PAINEL ESQUERDO */}
+
+        <aside className="relative flex flex-col justify-center overflow-hidden rounded-bl-xl bg-[var(--backgroundSecondary)] px-7 py-10 sm:px-12 lg:h-full lg:min-h-0 lg:px-10 lg:py-6 xl:px-16">
+          <div className="login-left-content relative z-10 mx-auto flex w-full max-w-[520px] flex-col">
+            <p className="mb-8 text-sm font-semibold tracking-wide text-[var(--textSecondary)] sm:mb-10 lg:mb-8">
+              ◆ Feedback Platform
+            </p>
+
+            {/* TÍTULO */}
+
+            <div className="max-w-[500px]">
+              <TextAnimate />
             </div>
 
-            <div className="flex w-full flex-col">
-              <label className="font-mono text-sm text-[#555555]">
-                SEGMENTO
-              </label>
+            <p className="mb-5 mt-5 max-w-[420px] text-base leading-relaxed text-[var(--textSecondary)] sm:text-lg lg:mb-3 lg:mt-5">
+              Feedbacks anônimos e honestos. Transforme cultura com dados reais.
+            </p>
 
-              <select
-                value={segment}
-                onChange={(e) => setSegment(e.target.value)}
-                className="w-full rounded-md border border-[#4b4b4b] bg-[#1e1e1e] px-3 py-2 text-sm"
+            {/* ILUSTRAÇÃO */}
+
+            <div className="relative my-3 flex h-[150px] shrink-0 items-center justify-center sm:h-[180px] lg:h-[190px]">
+              <div className="absolute h-40 w-40 rounded-full bg-[var(--greenLeve2)] opacity-60 blur-2xl sm:h-52 sm:w-52" />
+
+              <div className="relative flex items-center">
+                <div className="z-10 flex h-24 w-36 items-center justify-center rounded-[50%] rounded-bl-xl bg-[var(--greenSpan)] shadow-lg sm:h-32 sm:w-48">
+                  <div className="flex gap-3">
+                    <span className="h-3 w-3 rounded-full bg-[var(--greenLeve)]" />
+                    <span className="h-3 w-3 rounded-full bg-[var(--greenLeve)]" />
+                    <span className="h-3 w-3 rounded-full bg-[var(--greenLeve)]" />
+                  </div>
+                </div>
+
+                <div className="-ml-7 mt-12 flex h-20 w-32 items-center justify-center rounded-[50%] rounded-br-xl bg-[var(--greenSpan2)] shadow-md sm:h-28 sm:w-40">
+                  <div className="flex flex-col gap-2">
+                    <span className="h-1.5 w-10 rounded-full bg-[var(--textSecondary)] opacity-60" />
+                    <span className="h-1.5 w-10 rounded-full bg-[var(--textSecondary)] opacity-60" />
+                    <span className="h-1.5 w-7 rounded-full bg-[var(--textSecondary)] opacity-60" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* BENEFÍCIOS */}
+
+            <div className="mt-4 grid shrink-0 grid-cols-2 gap-4 border-t border-[var(--borders)] pt-5">
+              <div className="flex items-start gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--greenLeve2)] text-[var(--greenSpan)]">
+                  <ShieldCheck size={21} />
+                </div>
+
+                <div>
+                  <strong className="text-sm font-bold text-[var(--textTitles)]">
+                    100% anônimo
+                  </strong>
+
+                  <p className="mt-2 text-xs leading-relaxed text-[var(--textSecondary)]">
+                    Sem identificação, sem rastros.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--greenLeve2)] text-[var(--greenSpan)]">
+                  <Smile size={21} />
+                </div>
+
+                <div>
+                  <strong className="text-sm font-bold text-[var(--textTitles)]">
+                    Feito para ouvir melhor
+                  </strong>
+
+                  <p className="mt-2 text-xs leading-relaxed text-[var(--textSecondary)]">
+                    Decisões mais justas e equipes mais fortes.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        {/* PAINEL DIREITO - CADASTRO */}
+
+        <section className="flex items-center justify-center px-4 py-8 sm:px-8 lg:h-full lg:overflow-y-auto lg:px-10 lg:py-4 xl:px-16">
+          <div className="w-full max-w-[540px] rounded-2xl border border-[var(--borders)] bg-[var(--foreground)]/50 p-5 shadow-sm sm:p-7 lg:p-8">
+            {/* TÍTULO */}
+
+            <div className="mb-5">
+              <h1 className="text-2xl font-bold tracking-tight text-[var(--textTitles)] sm:text-3xl">
+                Comece gratuitamente
+              </h1>
+
+              <p className="mt-2 text-sm text-[var(--textSecondary)] sm:text-base">
+                Cadastre sua empresa e transforme feedbacks em decisões
+                melhores.
+              </p>
+            </div>
+
+            {/* FORMULÁRIO */}
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSubmit();
+              }}
+              className="flex flex-col gap-4"
+            >
+              {/* NOME DA EMPRESA */}
+
+              <div className="flex flex-col gap-2">
+                <label
+                  htmlFor="name"
+                  className="text-sm font-semibold text-[var(--textTitles)]"
+                >
+                  Nome da empresa
+                </label>
+
+                <input
+                  id="name"
+                  type="text"
+                  autoComplete="organization"
+                  placeholder="Digite o nome da sua empresa"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full rounded-lg border border-[var(--borders)] bg-[var(--backgroundSecondary)] px-4 py-2.5 text-sm text-[var(--textInput)] outline-none transition placeholder:text-[var(--textPlaceholder)] focus:border-[var(--greenSpan)] focus:ring-2 focus:ring-[var(--greenSpan2)]/30"
+                />
+              </div>
+
+              {/* SEGMENTO */}
+
+              <div className="flex flex-col gap-2">
+                <label
+                  htmlFor="segment"
+                  className="text-sm font-semibold text-[var(--textTitles)]"
+                >
+                  Segmento
+                </label>
+
+                <select
+                  id="segment"
+                  value={segment}
+                  onChange={(e) => setSegment(e.target.value)}
+                  className="w-full cursor-pointer rounded-lg border border-[var(--borders)] bg-[var(--backgroundSecondary)] px-4 py-2.5 text-sm text-[var(--textInput)] outline-none transition focus:border-[var(--greenSpan)] focus:ring-2 focus:ring-[var(--greenSpan2)]/30"
+                >
+                  <option value="">Selecione o segmento</option>
+                  <option value="Tecnologia">Tecnologia</option>
+                  <option value="E-commerce">E-commerce</option>
+                  <option value="Varejo">Varejo</option>
+                  <option value="Finanças">Finanças</option>
+                  <option value="Educação">Educação</option>
+                  <option value="Saúde">Saúde</option>
+                  <option value="Indústria">Indústria</option>
+                  <option value="Construção">Construção</option>
+                  <option value="Imobiliário">Imobiliário</option>
+                  <option value="Marketing e Publicidade">
+                    Marketing e Publicidade
+                  </option>
+                  <option value="Recursos Humanos">Recursos Humanos</option>
+                  <option value="Consultoria">Consultoria</option>
+                  <option value="Transporte e Logística">
+                    Transporte e Logística
+                  </option>
+                  <option value="Turismo e Hotelaria">
+                    Turismo e Hotelaria
+                  </option>
+                  <option value="Alimentação">Alimentação</option>
+                  <option value="Agronegócio">Agronegócio</option>
+                  <option value="Serviços Profissionais">
+                    Serviços Profissionais
+                  </option>
+                  <option value="Outro">Outro</option>
+                </select>
+              </div>
+
+              {/* EMAIL */}
+
+              <div className="flex flex-col gap-2">
+                <label
+                  htmlFor="email"
+                  className="text-sm font-semibold text-[var(--textTitles)]"
+                >
+                  Email
+                </label>
+
+                <input
+                  id="email"
+                  type="email"
+                  autoComplete="email"
+                  placeholder="Digite seu email corporativo"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full rounded-lg border border-[var(--borders)] bg-[var(--backgroundSecondary)] px-4 py-2.5 text-sm text-[var(--textInput)] outline-none transition placeholder:text-[var(--textPlaceholder)] focus:border-[var(--greenSpan)] focus:ring-2 focus:ring-[var(--greenSpan2)]/30"
+                />
+              </div>
+
+              {/* SENHAS */}
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                {/* SENHA */}
+
+                <div className="flex flex-col gap-2">
+                  <label
+                    htmlFor="password"
+                    className="text-sm font-semibold text-[var(--textTitles)]"
+                  >
+                    Senha
+                  </label>
+
+                  <div className="relative">
+                    <input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      autoComplete="new-password"
+                      placeholder="Digite sua senha"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="w-full rounded-lg border border-[var(--borders)] bg-[var(--backgroundSecondary)] px-3 py-2.5 pr-10 text-sm text-[var(--textInput)] outline-none transition placeholder:text-[var(--textPlaceholder)] focus:border-[var(--greenSpan)] focus:ring-2 focus:ring-[var(--greenSpan2)]/30"
+                    />
+
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      aria-label={
+                        showPassword ? "Ocultar senha" : "Mostrar senha"
+                      }
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--textSecondary)] transition hover:text-[var(--greenSpan)]"
+                    >
+                      {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+                    </button>
+                  </div>
+                </div>
+
+                {/* CONFIRMAR SENHA */}
+
+                <div className="flex flex-col gap-2">
+                  <label
+                    htmlFor="confirmPassword"
+                    className="text-sm font-semibold text-[var(--textTitles)]"
+                  >
+                    Confirmar senha
+                  </label>
+
+                  <div className="relative">
+                    <input
+                      id="confirmPassword"
+                      type={showConfirmPassword ? "text" : "password"}
+                      autoComplete="new-password"
+                      placeholder="Confirme sua senha"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      className="w-full rounded-lg border border-[var(--borders)] bg-[var(--backgroundSecondary)] px-3 py-2.5 pr-10 text-sm text-[var(--textInput)] outline-none transition placeholder:text-[var(--textPlaceholder)] focus:border-[var(--greenSpan)] focus:ring-2 focus:ring-[var(--greenSpan2)]/30"
+                    />
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
+                      aria-label={
+                        showConfirmPassword ? "Ocultar senha" : "Mostrar senha"
+                      }
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--textSecondary)] transition hover:text-[var(--greenSpan)]"
+                    >
+                      {showConfirmPassword ? (
+                        <EyeOff size={17} />
+                      ) : (
+                        <Eye size={17} />
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* MENSAGEM DE ERRO */}
+
+              {errorMessage && (
+                <span
+                  role="alert"
+                  className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600"
+                >
+                  {errorMessage}
+                </span>
+              )}
+
+              {/* BOTÃO DE CADASTRO */}
+
+              <button
+                disabled={loading}
+                type="submit"
+                className="mt-2 flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[var(--greenSpan)] px-5 py-3 text-sm font-bold text-[var(--foreground)] transition duration-300 hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                <option value="">Selecione um segmento</option>
-                <option value="Tecnologia">Tecnologia</option>
-                <option value="E-commerce">E-commerce</option>
-                <option value="Varejo">Varejo</option>
-                <option value="Finanças">Finanças</option>
-                <option value="Educação">Educação</option>
-                <option value="Saúde">Saúde</option>
-                <option value="Indústria">Indústria</option>
-                <option value="Construção">Construção</option>
-                <option value="Imobiliário">Imobiliário</option>
-                <option value="Marketing e Publicidade">
-                  Marketing e Publicidade
-                </option>
-                <option value="Recursos Humanos">Recursos Humanos</option>
-                <option value="Consultoria">Consultoria</option>
-                <option value="Transporte e Logística">
-                  Transporte e Logística
-                </option>
-                <option value="Turismo e Hotelaria">Turismo e Hotelaria</option>
-                <option value="Alimentação">Alimentação</option>
-                <option value="Agronegócio">Agronegócio</option>
-                <option value="Serviços Profissionais">
-                  Serviços Profissionais
-                </option>
-                <option value="Outro">Outro</option>
-              </select>
+                {loading ? (
+                  "Criando conta..."
+                ) : (
+                  <>
+                    Criar conta
+                    <ArrowRight size={17} />
+                  </>
+                )}
+              </button>
+            </form>
+
+            {/* LOGIN */}
+
+            <div className="mt-5 border-t border-[var(--borders)] pt-5 text-center">
+              <p className="text-sm text-[var(--textSecondary)]">
+                Já tem uma conta?{" "}
+                <Link
+                  href="/login"
+                  className="cursor-pointer font-bold text-[var(--greenSpan)] transition hover:text-[var(--textSecondary)]"
+                >
+                  Entrar
+                </Link>
+              </p>
             </div>
           </div>
+        </section>
+      </section>
 
-          <div className="flex flex-col">
-            <label className="font-mono text-sm text-[#555555]">EMAIL</label>
-
-            <input
-              type="text"
-              placeholder="digite o email..."
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-md border border-[#4b4b4b] bg-[#1e1e1e] px-3 py-2 text-sm text-[#f0ede6ce] placeholder:text-[#504e4e] focus:outline-none"
-            />
-          </div>
-
-          <div className="flex flex-col gap-3 md:flex-row">
-            <div className="flex w-full flex-col">
-              <label className="font-mono text-sm text-[#555555]">SENHA</label>
-
-              <input
-                type="password"
-                placeholder="digite sua senha..."
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-md border border-[#4b4b4b] bg-[#1e1e1e] px-3 py-2 text-sm text-[#f0ede6ce] placeholder:text-[#504e4e] focus:outline-none"
-              />
-            </div>
-
-            <div className="flex w-full flex-col">
-              <label className="font-mono text-sm text-[#555555]">
-                CONFIRMAR SENHA
-              </label>
-
-              <input
-                type="password"
-                value={confirmPassword}
-                placeholder="confirme a senha..."
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full rounded-md border border-[#4b4b4b] bg-[#1e1e1e] px-3 py-2 text-sm text-[#f0ede6ce] placeholder:text-[#504e4e] focus:outline-none"
-              />
-            </div>
-          </div>
-
-          {errorMessage && <span className="text-red-400">{errorMessage}</span>}
-
-          <button
-            disabled={loading}
-            type="submit"
-            className="mb-2 mt-6 cursor-pointer rounded-md bg-[#c7f464] px-4 py-2 font-semibold text-black transition hover:opacity-90"
-          >
-            {loading ? "Criando..." : "Criar conta →"}
-          </button>
-
-          <p className="mb-10 text-center text-sm">
-            Já tem conta?{" "}
-            <Link href="/login" className="cursor-pointer text-[#c8f55a]">
-              Entrar
-            </Link>
-          </p>
-        </form>
-      </div>
+      {/* MASCOTE */}
 
       <AnyMascot
         className="
-                !fixed
-                bottom-6
-                right-6
-                z-50
-                !w-14
-                sm:!w-16
-                lg:!w-16
-              "
+          !fixed
+          bottom-5
+          right-5
+          z-50
+          !w-14
+          sm:!w-16
+          lg:!w-16
+        "
       />
 
       <DialogMascot

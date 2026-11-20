@@ -2,10 +2,24 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Space_Grotesk } from "next/font/google";
 import { Syne, Syne_Mono } from "next/font/google";
+import { Manrope } from "next/font/google";
 import { Toaster } from "sonner";
 import { FormsProvider } from "@/components/context/FormsContext";
 import { AuthenticatedProvider } from "@/components/context/Authenticated";
 import "./globals.css";
+import { Poppins } from "next/font/google";
+
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-poppins",
+});
+
+const manrope = Manrope({
+  subsets: ["latin"],
+  variable: "--font-manrope",
+  weight: ["400", "500", "600", "700", "800"],
+});
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -43,7 +57,7 @@ export default function RootLayout({
   return (
     <html
       lang="pt-BR"
-      className={`${syne.variable} ${inter.variable} ${syneMono.variable} ${spaceGrotesk.variable} h-full antialiased`}
+      className={`${syne.variable} ${poppins.variable} ${inter.variable} ${manrope.variable} ${syneMono.variable} ${spaceGrotesk.variable} h-full antialiased`}
     >
       <body className="min-h-screen w-full font-syne">
         <AuthenticatedProvider>
