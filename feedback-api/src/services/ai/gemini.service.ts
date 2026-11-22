@@ -43,7 +43,7 @@ export async function analyzeFeedbacks(
   `;
 
   const response = await genAI.models.generateContent({
-    model: "gemini-3.8-flash",
+    model: "gemini-3.5-flash-lite",
     contents: prompt,
     config: {
       responseMimeType: "application/json",
