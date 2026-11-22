@@ -48,6 +48,30 @@ export interface CompanyStats {
   feedbacksLast7Days: number;
 }
 
+export interface FeedbackAnalysis {
+  summary: string;
+
+  sentiment: {
+    positive: number;
+    negative: number;
+    neutral: number;
+  };
+
+  categories: {
+    name: string;
+    count: number;
+    description: string;
+  }[];
+
+  recurringProblems: string[];
+
+  suggestions: {
+    title: string;
+    description: string;
+    priority: "low" | "medium" | "high";
+  }[];
+}
+
 export interface Company {
   id: string;
   name: string;
@@ -245,6 +269,30 @@ export async function getCompanyStats(): Promise<CompanyStats> {
 
     if (!response.ok) {
       throw new Error(result.error);
+    }
+
+    return result;
+  } catch (error) {
+    handleNetworkError(error);
+  }
+}
+
+export async function analyzeCompanyFeedbacks(): Promise<FeedbackAnalysis> {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/feedbacks/analysis`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      },
+    );
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || "Erro ao analisar feedbacks");
     }
 
     return result;

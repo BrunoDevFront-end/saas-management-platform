@@ -6,6 +6,8 @@ import {
   Company,
   CompanyStats,
   getCompanyStats,
+  analyzeCompanyFeedbacks,
+  FeedbackAnalysis,
 } from "@/components/request";
 
 import React, { useEffect, useState } from "react";
@@ -47,6 +49,10 @@ export default function Page() {
 
   const [company] = useState<Company | null>(() => getStoredCompany());
   const [stats, setStats] = useState<CompanyStats | null>(null);
+
+  const [analysis, setAnalysis] = useState<FeedbackAnalysis | null>(null);
+  const [analysisLoading, setAnalysisLoading] = useState(false);
+  const [analysisError, setAnalysisError] = useState<string | null>(null);
 
   const router = useRouter();
 
@@ -98,6 +104,29 @@ export default function Page() {
     loadStats();
   }, [isAuthenticated]);
 
+  // ANÁLISE INTELIGENTE
+
+  async function handleAnalyzeFeedbacks() {
+    try {
+      setAnalysisLoading(true);
+      setAnalysisError(null);
+
+      const result = await analyzeCompanyFeedbacks();
+
+      setAnalysis(result);
+    } catch (error) {
+      console.error("Erro ao analisar feedbacks:", error);
+
+      setAnalysisError(
+        error instanceof Error
+          ? error.message
+          : "Não foi possível realizar a análise.",
+      );
+    } finally {
+      setAnalysisLoading(false);
+    }
+  }
+
   // CONTROLE DOS FORMULÁRIOS
 
   async function handleFormDeleted(deleteId: string) {
@@ -141,6 +170,15 @@ export default function Page() {
   const activeFormsCount = forms.filter((form) => form.isActive).length;
 
   const companyInitial = company?.name?.charAt(0).toUpperCase() ?? "E";
+
+  const sentimentTotal = analysis
+    ? analysis.sentiment.positive +
+      analysis.sentiment.negative +
+      analysis.sentiment.neutral
+    : 0;
+
+  const getSentimentPercentage = (value: number) =>
+    sentimentTotal > 0 ? (value / sentimentTotal) * 100 : 0;
 
   // AUTENTICAÇÃO - CARREGAMENTO
 
@@ -351,6 +389,285 @@ export default function Page() {
                   Anônimo
                 </p>
               </article>
+            </section>
+
+            <section className="mb-10 overflow-hidden rounded-2xl border border-[var(--borders)] bg-[var(--foreground)]">
+              <div className="flex flex-col justify-between gap-5 border-b border-[var(--borders)] p-5 sm:flex-row sm:items-center sm:p-6">
+                <div className="flex items-start gap-3">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[var(--greenLeve)] text-[var(--greenSpan)]">
+                    <Sparkles size={22} />
+                  </div>
+
+                  <div>
+                    <h2 className="text-lg font-bold text-[var(--textTitles)] sm:text-xl">
+                      Análise inteligente
+                    </h2>
+                    <p className="mt-1 max-w-lg text-sm leading-relaxed text-[var(--textSecondary)]">
+                      Descubra padrões, identifique problemas e encontre
+                      oportunidades de melhoria nos feedbacks da sua equipe.
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleAnalyzeFeedbacks}
+                  disabled={
+                    analysisLoading || !stats || stats.totalFeedbacks === 0
+                  }
+                  className="flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-xl bg-[var(--greenSpan)] px-5 py-3 text-sm font-bold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <Sparkles size={17} />
+                  {analysisLoading
+                    ? "Analisando..."
+                    : analysis
+                      ? "Atualizar análise"
+                      : "Gerar análise"}
+                </button>
+              </div>
+
+              <div className="p-5 sm:p-6">
+                {analysisLoading ? (
+                  <div className="space-y-5">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 animate-pulse rounded-full bg-[var(--greenLeve)]" />
+                      <div className="flex-1 space-y-2">
+                        <div className="h-4 w-40 animate-pulse rounded bg-[var(--greenLeve2)]" />
+                        <div className="h-3 w-full max-w-sm animate-pulse rounded bg-[var(--greenLeve2)]" />
+                      </div>
+                    </div>
+                    <div className="h-24 animate-pulse rounded-xl bg-[var(--greenLeve)]/50" />
+                    <div className="grid gap-4 sm:grid-cols-3">
+                      <div className="h-24 animate-pulse rounded-xl bg-[var(--greenLeve)]/50" />
+                      <div className="h-24 animate-pulse rounded-xl bg-[var(--greenLeve)]/50" />
+                      <div className="h-24 animate-pulse rounded-xl bg-[var(--greenLeve)]/50" />
+                    </div>
+                  </div>
+                ) : analysisError ? (
+                  <div className="rounded-xl border border-red-200 bg-red-50 p-5">
+                    <h3 className="font-bold text-red-700">
+                      Não foi possível gerar a análise
+                    </h3>
+                    <p className="mt-2 text-sm leading-relaxed text-red-600">
+                      {analysisError}
+                    </p>
+                    <button
+                      onClick={handleAnalyzeFeedbacks}
+                      className="mt-4 rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-700"
+                    >
+                      Tentar novamente
+                    </button>
+                  </div>
+                ) : analysis ? (
+                  <div className="space-y-7">
+                    <div>
+                      <div className="mb-3 flex items-center gap-2">
+                        <Sparkles
+                          size={17}
+                          className="text-[var(--greenSpan)]"
+                        />
+                        <h3 className="font-bold text-[var(--textTitles)]">
+                          Visão geral
+                        </h3>
+                      </div>
+                      <p className="rounded-xl bg-[var(--backgroundSecondary)] p-4 text-sm leading-7 text-[var(--textSecondary)]">
+                        {analysis.summary}
+                      </p>
+                    </div>
+
+                    <div>
+                      <h3 className="mb-4 font-bold text-[var(--textTitles)]">
+                        Percepção dos colaboradores
+                      </h3>
+
+                      <div className="grid gap-3 sm:grid-cols-3">
+                        <div className="rounded-xl border border-[var(--borders)] p-4">
+                          <p className="text-sm text-[var(--textSecondary)]">
+                            Positivos
+                          </p>
+                          <strong className="mt-2 block text-3xl font-bold text-[var(--greenSpan)]">
+                            {analysis.sentiment.positive}
+                          </strong>
+                          <p className="mt-1 text-xs text-[var(--textSecondary)]">
+                            {getSentimentPercentage(
+                              analysis.sentiment.positive,
+                            ).toFixed(0)}
+                            % dos feedbacks
+                          </p>
+                        </div>
+
+                        <div className="rounded-xl border border-[var(--borders)] p-4">
+                          <p className="text-sm text-[var(--textSecondary)]">
+                            Negativos
+                          </p>
+                          <strong className="mt-2 block text-3xl font-bold text-red-500">
+                            {analysis.sentiment.negative}
+                          </strong>
+                          <p className="mt-1 text-xs text-[var(--textSecondary)]">
+                            {getSentimentPercentage(
+                              analysis.sentiment.negative,
+                            ).toFixed(0)}
+                            % dos feedbacks
+                          </p>
+                        </div>
+
+                        <div className="rounded-xl border border-[var(--borders)] p-4">
+                          <p className="text-sm text-[var(--textSecondary)]">
+                            Neutros
+                          </p>
+                          <strong className="mt-2 block text-3xl font-bold text-[var(--textSecondary)]">
+                            {analysis.sentiment.neutral}
+                          </strong>
+                          <p className="mt-1 text-xs text-[var(--textSecondary)]">
+                            {getSentimentPercentage(
+                              analysis.sentiment.neutral,
+                            ).toFixed(0)}
+                            % dos feedbacks
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="mt-4 flex h-2.5 overflow-hidden rounded-full bg-[var(--greenLeve2)]">
+                        <div
+                          className="bg-[var(--greenSpan)] transition-all"
+                          style={{
+                            width: `${getSentimentPercentage(analysis.sentiment.positive)}%`,
+                          }}
+                        />
+                        <div
+                          className="bg-red-400 transition-all"
+                          style={{
+                            width: `${getSentimentPercentage(analysis.sentiment.negative)}%`,
+                          }}
+                        />
+                        <div
+                          className="bg-gray-400 transition-all"
+                          style={{
+                            width: `${getSentimentPercentage(analysis.sentiment.neutral)}%`,
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <h3 className="mb-4 font-bold text-[var(--textTitles)]">
+                        Principais categorias
+                      </h3>
+
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        {analysis.categories.map((category, index) => (
+                          <article
+                            key={`${category.name}-${index}`}
+                            className="rounded-xl border border-[var(--borders)] p-4"
+                          >
+                            <div className="flex items-center justify-between gap-3">
+                              <h4 className="text-sm font-bold text-[var(--textTitles)]">
+                                {category.name}
+                              </h4>
+                              <span className="shrink-0 rounded-lg bg-[var(--greenLeve)] px-2.5 py-1 text-xs font-bold text-[var(--greenSpan)]">
+                                {category.count}{" "}
+                                {category.count === 1 ? "menção" : "menções"}
+                              </span>
+                            </div>
+                            <p className="mt-2 text-sm leading-relaxed text-[var(--textSecondary)]">
+                              {category.description}
+                            </p>
+                          </article>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <h3 className="mb-4 font-bold text-[var(--textTitles)]">
+                        Problemas recorrentes
+                      </h3>
+
+                      {analysis.recurringProblems.length > 0 ? (
+                        <div className="space-y-2">
+                          {analysis.recurringProblems.map((problem, index) => (
+                            <div
+                              key={index}
+                              className="flex items-start gap-3 rounded-xl border border-[var(--borders)] p-4"
+                            >
+                              <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-amber-500" />
+                              <p className="text-sm leading-relaxed text-[var(--textSecondary)]">
+                                {problem}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="rounded-xl bg-[var(--backgroundSecondary)] p-4 text-sm text-[var(--textSecondary)]">
+                          Nenhum problema recorrente foi identificado.
+                        </p>
+                      )}
+                    </div>
+
+                    <div>
+                      <h3 className="mb-4 font-bold text-[var(--textTitles)]">
+                        Sugestões de melhoria
+                      </h3>
+
+                      <div className="space-y-3">
+                        {analysis.suggestions.map((suggestion, index) => (
+                          <article
+                            key={index}
+                            className="rounded-xl border border-[var(--borders)] p-4"
+                          >
+                            <div className="flex flex-wrap items-center justify-between gap-2">
+                              <h4 className="font-bold text-[var(--textTitles)]">
+                                {suggestion.title}
+                              </h4>
+
+                              <span
+                                className={`rounded-lg px-2.5 py-1 text-xs font-bold ${
+                                  suggestion.priority === "high"
+                                    ? "bg-red-50 text-red-600"
+                                    : suggestion.priority === "medium"
+                                      ? "bg-amber-50 text-amber-700"
+                                      : "bg-[var(--greenLeve)] text-[var(--greenSpan)]"
+                                }`}
+                              >
+                                {suggestion.priority === "high"
+                                  ? "Alta prioridade"
+                                  : suggestion.priority === "medium"
+                                    ? "Média prioridade"
+                                    : "Baixa prioridade"}
+                              </span>
+                            </div>
+
+                            <p className="mt-2 text-sm leading-relaxed text-[var(--textSecondary)]">
+                              {suggestion.description}
+                            </p>
+                          </article>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center px-4 py-10 text-center">
+                    <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--greenLeve)] text-[var(--greenSpan)]">
+                      <Sparkles size={26} />
+                    </div>
+
+                    <h3 className="font-bold text-[var(--textTitles)]">
+                      Descubra o que sua equipe está dizendo
+                    </h3>
+
+                    <p className="mt-2 max-w-md text-sm leading-relaxed text-[var(--textSecondary)]">
+                      Gere uma análise inteligente para identificar sentimentos,
+                      problemas recorrentes e oportunidades de melhoria nos
+                      feedbacks recebidos.
+                    </p>
+
+                    {stats?.totalFeedbacks === 0 && (
+                      <p className="mt-4 text-xs text-[var(--textSecondary)]">
+                        Você precisa receber feedbacks antes de gerar uma
+                        análise.
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
             </section>
 
             {/* FORMULÁRIOS */}
