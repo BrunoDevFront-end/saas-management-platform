@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import prisma from "../prisma/client";
+import { analyzeFeedbacks } from "../services/ai/gemini.service";
 
 export const feedbackController = {
   async create(req: Request, res: Response) {
@@ -49,6 +50,43 @@ export const feedbackController = {
     } catch (error) {
       console.error(error);
       return res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  },
+
+  async analyze(req: Request, res: Response) {
+    try {
+      const companyId = req.company!.id;
+
+      // Busca todos os feedbacks dos formulários da empresa
+      const feedbacks = await prisma.feedback.findMany({
+        where: {
+          form: {
+            companyId,
+          },
+        },
+        select: {
+          content: true,
+        },
+      });
+
+      if (feedbacks.length === 0) {
+        return res.status(404).json({
+          error: "Ainda não existem feedbacks para analisar.",
+        });
+      }
+
+      // Envia os comentários para análise do Gemini
+      const analysis = await analyzeFeedbacks(
+        feedbacks.map((feedback) => feedback.content),
+      );
+
+      return res.status(200).json(analysis);
+    } catch (error) {
+      console.error("Erro ao analisar feedbacks:", error);
+
+      return res.status(500).json({
+        error: "Erro ao realizar análise dos feedbacks.",
+      });
     }
   },
 

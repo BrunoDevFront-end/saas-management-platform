@@ -9,6 +9,7 @@ const router = Router();
 router.post("/public/:slug", feedbackLimiter, feedbackController.create);
 
 // rotas privadas
+router.post("/analysis", authMiddleware, feedbackController.analyze);
 router.get("/:formId", authMiddleware, feedbackController.list);
 router.delete("/:feedbackId", authMiddleware, feedbackController.deletar);
 
